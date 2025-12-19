@@ -11,6 +11,8 @@ It has always been possible to force higher resolutions by editing `config.cfg` 
 
 This patched dll fixes both of them.
 
+![proof](https://i.imgur.com/75vANI8.jpeg)
+
 ---
 
 ## What This Patched DLL Does?
@@ -19,7 +21,7 @@ This patched dll fixes both of them.
 - Enables modern resolutions such as:
   - 1920×1080
   - 2560×1440
-  - 3840×2160 (4K)
+  - 3840×2160
 - Prevents the game from resetting to **640×480** when changing options (e.g. volume)
 - Works with the **Steam version** of *Blitzkrieg Anthology*
 
@@ -30,14 +32,14 @@ This patched dll fixes both of them.
 You **do not need to compile anything** if you just want to play.
 
 **Patched DLL available here:**  
-https://github.com/brian8544/BlitzkriegPatch/releases
+[GFX.dll](https://github.com/brian8544/BlitzkriegPatch/releases/download/1.0/GFX.dll)
 
 ---
 
 ## Installation Guide (For Players)
 
-1. Download the patched `gfx.dll` from the **Releases** page
-2. Navigate to your Blitzkrieg installation folder: `SteamFolder\steamapps\common\Blitzkrieg Anthology\Blitzkrieg`
+1. Download the patched `gfx.dll` from the [releases](https://github.com/brian8544/BlitzkriegPatch/releases/download/1.0/GFX.dll) page.
+2. Navigate to your Blitzkrieg installation folder: `SteamFolder\steamapps\common\Blitzkrieg Anthology\Blitzkrieg`.
 3. Replace the original `gfx.dll` with the mine.
 4. Set your desired resolution in-game.
 

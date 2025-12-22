@@ -1,23 +1,38 @@
+/*
+    Blitzkrieg 1 binary patcher
+    Fixes the hardcoded resolution limits in Blitzkrieg 1 binaries.
+
+    TESTED ON:
+    https://store.steampowered.com/app/313480
+
+    IMPORTANT:
+    - Stay Windows XP compatible.
+    - Many players still run and compile on older machines.
+    - Target x86 (32-bit) only to match the original game binaries.
+
+    GUIDE:
+	1.) Build this patcher as x86 (32-bit).
+	2.) Put 'gfx.dll' and 'game.exe' in the same folder as this patcher.
+	3.) Run the patcher.
+	4.) It will patch 'GFX.dll' and three versions of 'game_X.exe' for 1080p, 1440p, and 2160p.
+	5.) You can either run one of the patched game versions directly or rename 'game_X.exe' back to 'game.exe' to run it through Steam.
+
+    LICENSE:
+    https://github.com/nival/Blitzkrieg/blob/main/LICENSE.md
+*/
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
 #include <iomanip>
 
-struct ResolutionConfig
-{
-    std::string name;
-    uint16_t menuWidth;
-    uint16_t menuHeight;
-    std::string outputSuffix;
-};
-
 bool patchGfxDll(const std::string &filename)
 {
     std::ifstream file(filename, std::ios::binary);
     if (!file)
     {
-        std::cerr << "Error: Cannot open " << filename << std::endl;
+        std::cerr << "Error: Cannot open " << filename << "\n";
         return false;
     }
 
@@ -25,15 +40,12 @@ bool patchGfxDll(const std::string &filename)
                               std::istreambuf_iterator<char>());
     file.close();
 
-    /*
-     * Allow the same size as the original developers intended
-     * https://github.com/nival/Blitzkrieg/blob/793501a063eccf6ca522e19705f0af2a16cae0be/Sources/src/GFX/GFXObjectFactory.cpp#L67
-     */
-    const uint16_t maxWidth = 1000000;
-    const uint16_t maxHeight = 1000000;
+    // Allow the same size as the original developers intended: https://github.com/nival/Blitzkrieg/blob/793501a063eccf6ca522e19705f0af2a16cae0be/Sources/src/GFX/GFXObjectFactory.cpp#L67
+    const uint32_t maxWidth = 1000000;
+    const uint32_t maxHeight = 1000000;
     bool foundPatches = false;
 
-    std::cout << "Patching gfx.dll..." << std::endl;
+    std::cout << "Patching gfx.dll...\n";
 
     for (size_t i = 0; i < data.size() - 5; i++)
     {
@@ -41,15 +53,14 @@ bool patchGfxDll(const std::string &filename)
             data[i + 1] == 0x40 && data[i + 2] == 0x06 &&
             data[i + 3] == 0x00 && data[i + 4] == 0x00)
         {
-
             std::cout << "Found width limit (1600) at offset: 0x"
-                      << std::hex << std::setw(8) << std::setfill('0') << i << std::dec << std::endl;
+                      << std::hex << std::setw(8) << std::setfill('0') << i << std::dec << "\n";
 
             data[i + 1] = maxWidth & 0xFF;
             data[i + 2] = (maxWidth >> 8) & 0xFF;
 
             std::cout << "  Patched to: " << maxWidth << " (0x"
-                      << std::hex << maxWidth << std::dec << ")" << std::endl;
+                      << std::hex << maxWidth << std::dec << ")\n";
             foundPatches = true;
         }
     }
@@ -60,22 +71,21 @@ bool patchGfxDll(const std::string &filename)
             data[i + 1] == 0xB0 && data[i + 2] == 0x04 &&
             data[i + 3] == 0x00 && data[i + 4] == 0x00)
         {
-
             std::cout << "Found height limit (1200) at offset: 0x"
-                      << std::hex << std::setw(8) << std::setfill('0') << i << std::dec << std::endl;
+                      << std::hex << std::setw(8) << std::setfill('0') << i << std::dec << "\n";
 
             data[i + 1] = maxHeight & 0xFF;
             data[i + 2] = (maxHeight >> 8) & 0xFF;
 
             std::cout << "  Patched to: " << maxHeight << " (0x"
-                      << std::hex << maxHeight << std::dec << ")" << std::endl;
+                      << std::hex << maxHeight << std::dec << ")\n";
             foundPatches = true;
         }
     }
 
     if (!foundPatches)
     {
-        std::cerr << "Error: Could not find resolution limits" << std::endl;
+        std::cerr << "Error: Could not find resolution limits\n";
         return false;
     }
 
@@ -83,24 +93,24 @@ bool patchGfxDll(const std::string &filename)
     std::ofstream outFile(outputName, std::ios::binary);
     if (!outFile)
     {
-        std::cerr << "Error: Cannot write to " << outputName << std::endl;
+        std::cerr << "Error: Cannot write to " << outputName << "\n";
         return false;
     }
 
     outFile.write(reinterpret_cast<const char *>(data.data()), data.size());
     outFile.close();
 
-    std::cout << "Successfully created: " << outputName << std::endl
-              << std::endl;
+    std::cout << "Successfully created: " << outputName << "\n\n";
     return true;
 }
 
-bool patchGameExe(const std::string &filename, const ResolutionConfig &config)
+bool patchGameExe(const std::string &filename, const std::string &name,
+                  uint16_t menuWidth, uint16_t menuHeight, const std::string &outputSuffix)
 {
     std::ifstream file(filename, std::ios::binary);
     if (!file)
     {
-        std::cerr << "Error: Cannot open " << filename << std::endl;
+        std::cerr << "Error: Cannot open " << filename << "\n";
         return false;
     }
 
@@ -110,7 +120,7 @@ bool patchGameExe(const std::string &filename, const ResolutionConfig &config)
 
     bool foundPatches = false;
 
-    std::cout << "Patching game.exe " << config.name << " version..." << std::endl;
+    std::cout << "Patching game.exe " << name << " version...\n";
 
     for (size_t i = 0; i < data.size() - 5; i++)
     {
@@ -118,15 +128,14 @@ bool patchGameExe(const std::string &filename, const ResolutionConfig &config)
             data[i + 1] == 0x00 && data[i + 2] == 0x04 &&
             data[i + 3] == 0x00 && data[i + 4] == 0x00)
         {
-
             std::cout << "Found InterMission width limit (1024) at offset: 0x"
-                      << std::hex << std::setw(8) << std::setfill('0') << i << std::dec << std::endl;
+                      << std::hex << std::setw(8) << std::setfill('0') << i << std::dec << "\n";
 
-            data[i + 1] = config.menuWidth & 0xFF;
-            data[i + 2] = (config.menuWidth >> 8) & 0xFF;
+            data[i + 1] = menuWidth & 0xFF;
+            data[i + 2] = (menuWidth >> 8) & 0xFF;
 
-            std::cout << "  Patched to: " << config.menuWidth << " (0x"
-                      << std::hex << config.menuWidth << std::dec << ")" << std::endl;
+            std::cout << "  Patched to: " << menuWidth << " (0x"
+                      << std::hex << menuWidth << std::dec << ")\n";
             foundPatches = true;
         }
     }
@@ -137,38 +146,36 @@ bool patchGameExe(const std::string &filename, const ResolutionConfig &config)
             data[i + 1] == 0x00 && data[i + 2] == 0x03 &&
             data[i + 3] == 0x00 && data[i + 4] == 0x00)
         {
-
             std::cout << "Found InterMission height limit (768) at offset: 0x"
-                      << std::hex << std::setw(8) << std::setfill('0') << i << std::dec << std::endl;
+                      << std::hex << std::setw(8) << std::setfill('0') << i << std::dec << "\n";
 
-            data[i + 1] = config.menuHeight & 0xFF;
-            data[i + 2] = (config.menuHeight >> 8) & 0xFF;
+            data[i + 1] = menuHeight & 0xFF;
+            data[i + 2] = (menuHeight >> 8) & 0xFF;
 
-            std::cout << "  Patched to: " << config.menuHeight << " (0x"
-                      << std::hex << config.menuHeight << std::dec << ")" << std::endl;
+            std::cout << "  Patched to: " << menuHeight << " (0x"
+                      << std::hex << menuHeight << std::dec << ")\n";
             foundPatches = true;
         }
     }
 
     if (!foundPatches)
     {
-        std::cerr << "Error: Could not find resolution limits" << std::endl;
+        std::cerr << "Error: Could not find resolution limits\n";
         return false;
     }
 
-    std::string outputName = filename.substr(0, filename.find_last_of('.')) + config.outputSuffix;
+    std::string outputName = filename.substr(0, filename.find_last_of('.')) + outputSuffix;
     std::ofstream outFile(outputName, std::ios::binary);
     if (!outFile)
     {
-        std::cerr << "Error: Cannot write to " << outputName << std::endl;
+        std::cerr << "Error: Cannot write to " << outputName << "\n";
         return false;
     }
 
     outFile.write(reinterpret_cast<const char *>(data.data()), data.size());
     outFile.close();
 
-    std::cout << "Successfully created: " << outputName << std::endl
-              << std::endl;
+    std::cout << "Successfully created: " << outputName << "\n\n";
     return true;
 }
 
@@ -182,49 +189,42 @@ int main(int argc, char *argv[])
 
     if (!testDll)
     {
-        std::cerr << "Error: Cannot find " << dllPath << " in current directory" << std::endl;
+        std::cerr << "Error: Cannot find " << dllPath << " in current directory\n";
         return 1;
     }
     if (!testExe)
     {
-        std::cerr << "Error: Cannot find " << exePath << " in current directory" << std::endl;
+        std::cerr << "Error: Cannot find " << exePath << " in current directory\n";
         return 1;
     }
     testDll.close();
     testExe.close();
 
-    std::cout << "Target files: " << dllPath << ", " << exePath << std::endl
-              << std::endl;
+    std::cout << "Target files: " << dllPath << ", " << exePath << "\n\n";
 
     if (!patchGfxDll(dllPath))
     {
-        std::cerr << "\nPatching gfx.dll failed!" << std::endl;
+        std::cerr << "\nPatching gfx.dll failed!\n";
         return 1;
     }
 
-    std::vector<ResolutionConfig> configs = {
-        {"1080p", 1920, 1080, "_patched_1080p.exe"},
-        {"1440p", 2560, 1440, "_patched_1440p.exe"},
-        {"2160p", 3840, 2160, "_patched_2160p.exe"}};
-
     int successCount = 0;
-    for (const auto &config : configs)
-    {
-        if (patchGameExe(exePath, config))
-        {
-            successCount++;
-        }
-    }
 
-    if (successCount == configs.size())
+    if (patchGameExe(exePath, "1080p", 1920, 1080, "_patched_1080p.exe"))
+        successCount++;
+    if (patchGameExe(exePath, "1440p", 2560, 1440, "_patched_1440p.exe"))
+        successCount++;
+    if (patchGameExe(exePath, "2160p", 3840, 2160, "_patched_2160p.exe"))
+        successCount++;
+
+    if (successCount == 3)
     {
-        std::cout << "Patching completed successfully!" << std::endl;
-        std::cout << "Created gfx_patched.dll and " << successCount << " game.exe versions" << std::endl;
-        std::cout << "You can either run one of the patched game versions directly or rename 'game_patched_X.exe' back to 'game.exe' to run it through Steam." << std::endl;
+        std::cout << "Patching completed successfully!\n";
+        std::cout << "You can either run one of the patched game versions directly or rename 'game_X.exe' back to 'game.exe' to run it through Steam.\n";
     }
     else
     {
-        std::cerr << "\nPatching failed!" << std::endl;
+        std::cerr << "\nPatching failed!\n";
         return 1;
     }
 

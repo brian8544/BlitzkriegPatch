@@ -1,0 +1,517 @@
+Address	Length	Type	String
+.data:005C3880	00000015	C	GFX.Mode.Current.BPP
+.data:005C3934	0000001B	C	GFX.Mode.Current.Frequency
+.data:005C38F8	0000001C	C	GFX.Mode.Current.FullScreen
+.data:005C3818	00000017	C	GFX.Mode.Current.SizeX
+.data:005C384C	00000017	C	GFX.Mode.Current.SizeY
+.data:005C38B8	00000019	C	GFX.Mode.Current.Stencil
+.data:005C377C	0000001A	C	GFX.Mode.InterMission.BPP
+.data:005C3864	0000001A	C	GFX.Mode.InterMission.BPP
+.data:005C3B8C	0000001A	C	GFX.Mode.InterMission.BPP
+.data:005C37DC	00000020	C	GFX.Mode.InterMission.Frequency
+.data:005C3914	00000020	C	GFX.Mode.InterMission.Frequency
+.data:005C3BEC	00000020	C	GFX.Mode.InterMission.Frequency
+.data:005C37B8	00000021	C	GFX.Mode.InterMission.FullScreen
+.data:005C38D4	00000021	C	GFX.Mode.InterMission.FullScreen
+.data:005C3BC8	00000021	C	GFX.Mode.InterMission.FullScreen
+.data:005C3744	0000001C	C	GFX.Mode.InterMission.SizeX
+.data:005C37FC	0000001C	C	GFX.Mode.InterMission.SizeX
+.data:005C3B54	0000001C	C	GFX.Mode.InterMission.SizeX
+.data:005C3760	0000001C	C	GFX.Mode.InterMission.SizeY
+.data:005C3830	0000001C	C	GFX.Mode.InterMission.SizeY
+.data:005C3B70	0000001C	C	GFX.Mode.InterMission.SizeY
+.data:005C3798	0000001E	C	GFX.Mode.InterMission.Stencil
+.data:005C3898	0000001E	C	GFX.Mode.InterMission.Stencil
+.data:005C3BA8	0000001E	C	GFX.Mode.InterMission.Stencil
+.data:005C36D8	00000015	C	GFX.Mode.Mission.BPP
+.data:005C3728	0000001B	C	GFX.Mode.Mission.Frequency
+.data:005C370C	0000001C	C	GFX.Mode.Mission.FullScreen
+.data:005C36A8	00000017	C	GFX.Mode.Mission.SizeX
+.data:005C36C0	00000017	C	GFX.Mode.Mission.SizeY
+.data:005C36F0	00000019	C	GFX.Mode.Mission.Stencil
+
+.text:00403139 ; ---------------------------------------------------------------------------
+.text:00403139
+.text:00403139 loc_403139:                             ; CODE XREF: WinMain(x,x,x,x)+706↑j
+.text:00403139                                         ; WinMain(x,x,x,x)+73A↑j ...
+.text:00403139 ;   try {
+.text:00403139                 mov     byte ptr [ebp+var_4], 0Fh
+.text:0040313D                 lea     ecx, [ebp+var_4F0]
+.text:00403143                 call    sub_4080A0
+.text:00403143 ;   } // starts at 403139
+.text:00403148 ;   try {
+.text:00403148                 mov     byte ptr [ebp+var_4], 0Eh
+.text:0040314C                 lea     ecx, [ebp+var_4E4]
+.text:00403152                 call    sub_405C40
+.text:00403152 ;   } // starts at 403148
+.text:00403157
+.text:00403157 loc_403157:                             ; CODE XREF: WinMain(x,x,x,x)+66A↑j
+.text:00403157 ;   try {
+.text:00403157                 mov     byte ptr [ebp+var_4], 8
+.text:0040315B                 lea     ecx, [ebp+var_4E0]
+.text:00403161                 call    sub_406560
+.text:00403166                 lea     ecx, [ebp+var_24]
+.text:00403169                 call    sub_4065E0
+.text:0040316E                 push    offset aConstsXml ; "consts.xml"
+.text:00403173                 call    sub_4064B0
+.text:00403178                 add     esp, 4
+.text:0040317B                 push    eax
+.text:0040317C                 lea     ecx, [ebp+var_504]
+.text:00403182                 call    sub_4063B0
+.text:00403182 ;   } // starts at 403157
+.text:00403187 ;   try {
+.text:00403187                 mov     byte ptr [ebp+var_4], 16h
+.text:0040318B                 lea     edx, [ebp+var_504]
+.text:00403191                 push    edx
+.text:00403192                 call    sub_428080
+.text:00403197                 add     esp, 4
+.text:0040319A                 mov     eax, dword ptr [ebp+var_C0]
+.text:004031A0                 push    eax             ; ArgList
+.text:004031A1                 push    offset aGfxModeMission ; "GFX.Mode.Mission.SizeX"
+.text:004031A6                 call    sub_406340
+.text:004031AB                 add     esp, 8
+.text:004031AE                 mov     ecx, dword ptr [ebp+var_BC]
+.text:004031B4                 push    ecx             ; ArgList
+.text:004031B5                 push    offset aGfxModeMission_0 ; "GFX.Mode.Mission.SizeY"
+.text:004031BA                 call    sub_406340
+.text:004031BF                 add     esp, 8
+.text:004031C2                 mov     edx, dword ptr [ebp+var_B8]
+.text:004031C8                 push    edx             ; ArgList
+.text:004031C9                 push    offset aGfxModeMission_1 ; "GFX.Mode.Mission.BPP"
+.text:004031CE                 call    sub_406340
+.text:004031D3                 add     esp, 8
+.text:004031D6                 mov     eax, dword ptr [ebp+var_B4]
+.text:004031DC                 push    eax             ; ArgList
+.text:004031DD                 push    offset aGfxModeMission_2 ; "GFX.Mode.Mission.Stencil"
+.text:004031E2                 call    sub_406340
+.text:004031E7                 add     esp, 8
+.text:004031EA                 mov     ecx, dword ptr [ebp+var_AC]
+.text:004031F0                 push    ecx             ; ArgList
+.text:004031F1                 push    offset aGfxModeMission_3 ; "GFX.Mode.Mission.FullScreen"
+.text:004031F6                 call    sub_406340
+.text:004031FB                 add     esp, 8
+.text:004031FE                 mov     edx, dword ptr [ebp+var_B0]
+.text:00403204                 push    edx             ; ArgList
+.text:00403205                 push    offset aGfxModeMission_4 ; "GFX.Mode.Mission.Frequency"
+.text:0040320A                 call    sub_406340
+.text:0040320F                 add     esp, 8
+.text:00403212                 push    400h            ; ArgList
+.text:00403217                 push    offset aGfxModeIntermi ; "GFX.Mode.InterMission.SizeX"
+.text:0040321C                 call    sub_406340
+.text:00403221                 add     esp, 8
+.text:00403224                 push    300h            ; ArgList
+.text:00403229                 push    offset aGfxModeIntermi_0 ; "GFX.Mode.InterMission.SizeY"
+.text:0040322E                 call    sub_406340
+.text:00403233                 add     esp, 8
+.text:00403236                 mov     eax, dword ptr [ebp+var_B8]
+.text:0040323C                 push    eax             ; ArgList
+.text:0040323D                 push    offset aGfxModeIntermi_1 ; "GFX.Mode.InterMission.BPP"
+.text:00403242                 call    sub_406340
+.text:00403247                 add     esp, 8
+.text:0040324A                 push    0FFFFFFFFh      ; ArgList
+.text:0040324C                 push    offset aGfxModeIntermi_2 ; "GFX.Mode.InterMission.Stencil"
+.text:00403251                 call    sub_406340
+.text:00403256                 add     esp, 8
+.text:00403259                 mov     ecx, dword ptr [ebp+var_AC]
+.text:0040325F                 push    ecx             ; ArgList
+.text:00403260                 push    offset aGfxModeIntermi_3 ; "GFX.Mode.InterMission.FullScreen"
+.text:00403265                 call    sub_406340
+.text:0040326A                 add     esp, 8
+.text:0040326D                 mov     edx, dword ptr [ebp+var_B0]
+.text:00403273                 push    edx             ; ArgList
+.text:00403274                 push    offset aGfxModeIntermi_4 ; "GFX.Mode.InterMission.Frequency"
+.text:00403279                 call    sub_406340
+.text:0040327E                 add     esp, 8
+.text:00403281                 push    400h
+.text:00403286                 push    offset aGfxModeIntermi_5 ; "GFX.Mode.InterMission.SizeX"
+.text:0040328B                 call    sub_406270
+.text:00403290                 add     esp, 8
+.text:00403293                 push    eax             ; ArgList
+.text:00403294                 push    offset aGfxModeCurrent ; "GFX.Mode.Current.SizeX"
+.text:00403299                 call    sub_406340
+.text:0040329E                 add     esp, 8
+.text:004032A1                 push    300h
+.text:004032A6                 push    offset aGfxModeIntermi_6 ; "GFX.Mode.InterMission.SizeY"
+.text:004032AB                 call    sub_406270
+.text:004032B0                 add     esp, 8
+.text:004032B3                 push    eax             ; ArgList
+.text:004032B4                 push    offset aGfxModeCurrent_0 ; "GFX.Mode.Current.SizeY"
+.text:004032B9                 call    sub_406340
+.text:004032BE                 add     esp, 8
+.text:004032C1                 mov     eax, dword ptr [ebp+var_B8]
+.text:004032C7                 push    eax
+.text:004032C8                 push    offset aGfxModeIntermi_7 ; "GFX.Mode.InterMission.BPP"
+.text:004032CD                 call    sub_406270
+.text:004032D2                 add     esp, 8
+.text:004032D5                 push    eax             ; ArgList
+.text:004032D6                 push    offset aGfxModeCurrent_1 ; "GFX.Mode.Current.BPP"
+.text:004032DB                 call    sub_406340
+.text:004032E0                 add     esp, 8
+.text:004032E3                 mov     ecx, dword ptr [ebp+var_B4]
+.text:004032E9                 push    ecx
+.text:004032EA                 push    offset aGfxModeIntermi_8 ; "GFX.Mode.InterMission.Stencil"
+.text:004032EF                 call    sub_406270
+.text:004032F4                 add     esp, 8
+.text:004032F7                 push    eax             ; ArgList
+.text:004032F8                 push    offset aGfxModeCurrent_2 ; "GFX.Mode.Current.Stencil"
+.text:004032FD                 call    sub_406340
+.text:00403302                 add     esp, 8
+.text:00403305                 mov     edx, dword ptr [ebp+var_AC]
+.text:0040330B                 push    edx
+.text:0040330C                 push    offset aGfxModeIntermi_9 ; "GFX.Mode.InterMission.FullScreen"
+.text:00403311                 call    sub_406270
+.text:00403316                 add     esp, 8
+.text:00403319                 push    eax             ; ArgList
+.text:0040331A                 push    offset aGfxModeCurrent_3 ; "GFX.Mode.Current.FullScreen"
+.text:0040331F                 call    sub_406340
+.text:00403324                 add     esp, 8
+.text:00403327                 mov     eax, dword ptr [ebp+var_B0]
+.text:0040332D                 push    eax
+.text:0040332E                 push    offset aGfxModeIntermi_10 ; "GFX.Mode.InterMission.Frequency"
+.text:00403333                 call    sub_406270
+.text:00403338                 add     esp, 8
+.text:0040333B                 push    eax             ; ArgList
+.text:0040333C                 push    offset aGfxModeCurrent_4 ; "GFX.Mode.Current.Frequency"
+.text:00403341                 call    sub_406340
+.text:00403346                 add     esp, 8
+.text:00403346 ;   } // starts at 403187
+.text:00403349 ;   try {
+.text:00403349                 mov     byte ptr [ebp+var_4], 8
+.text:0040334D                 lea     ecx, [ebp+var_504]
+.text:00403353                 call    sub_405ED0
+.text:00403358                 push    offset aConstsTable ; "consts table"
+.text:0040335D                 lea     ecx, [ebp+var_24]
+.text:00403360                 call    sub_406600
+.text:00403365                 call    sub_418090
+.text:0040336A                 push    eax
+.text:0040336B                 lea     ecx, [ebp+var_508]
+.text:00403371                 call    sub_406660
+.text:00403371 ;   }
+
+.data:005C361C aDataPak        db '\data\*.pak',0      ; DATA XREF: WinMain(x,x,x,x):loc_402E94↑o
+.data:005C3628 aDataPak_0      db '.\data\*.pak',0     ; DATA XREF: WinMain(x,x,x,x)+5CF↑o
+.data:005C3635                 align 4
+.data:005C3638 aResourceSystem db 'resource system',0  ; DATA XREF: WinMain(x,x,x,x)+61C↑o
+.data:005C3648 aDemoDemoXml    db 'demo\demo.xml',0    ; DATA XREF: WinMain(x,x,x,x)+636↑o
+.data:005C3656                 align 4
+.data:005C3658 aBase           db 'base',0             ; DATA XREF: WinMain(x,x,x,x)+670↑o
+.data:005C365D                 align 10h
+.data:005C3660 aMissions       db 'Missions',0         ; DATA XREF: WinMain(x,x,x,x)+6E4↑o
+.data:005C3669                 align 4
+.data:005C366C aDemoversion    db 'demoversion',0      ; DATA XREF: WinMain(x,x,x,x)+70E↑o
+.data:005C3678 aDemomissionNum db 'demomission.number',0
+.data:005C3678                                         ; DATA XREF: WinMain(x,x,x,x)+727↑o
+.data:005C368B                 align 4
+.data:005C368C ; char aDemomissionD[]
+.data:005C368C aDemomissionD   db 'demomission.%d',0   ; DATA XREF: WinMain(x,x,x,x)+7A0↑o
+.data:005C369B                 align 4
+.data:005C369C aConstsXml      db 'consts.xml',0       ; DATA XREF: WinMain(x,x,x,x)+83F↑o
+.data:005C36A7                 align 4
+.data:005C36A8 aGfxModeMission db 'GFX.Mode.Mission.SizeX',0
+.data:005C36A8                                         ; DATA XREF: WinMain(x,x,x,x)+872↑o
+.data:005C36BF                 align 10h
+.data:005C36C0 aGfxModeMission_0 db 'GFX.Mode.Mission.SizeY',0
+.data:005C36C0                                         ; DATA XREF: WinMain(x,x,x,x)+886↑o
+.data:005C36D7                 align 4
+.data:005C36D8 aGfxModeMission_1 db 'GFX.Mode.Mission.BPP',0
+.data:005C36D8                                         ; DATA XREF: WinMain(x,x,x,x)+89A↑o
+.data:005C36ED                 align 10h
+.data:005C36F0 aGfxModeMission_2 db 'GFX.Mode.Mission.Stencil',0
+.data:005C36F0                                         ; DATA XREF: WinMain(x,x,x,x)+8AE↑o
+.data:005C3709                 align 4
+.data:005C370C aGfxModeMission_3 db 'GFX.Mode.Mission.FullScreen',0
+.data:005C370C                                         ; DATA XREF: WinMain(x,x,x,x)+8C2↑o
+.data:005C3728 aGfxModeMission_4 db 'GFX.Mode.Mission.Frequency',0
+.data:005C3728                                         ; DATA XREF: WinMain(x,x,x,x)+8D6↑o
+.data:005C3743                 align 4
+.data:005C3744 aGfxModeIntermi db 'GFX.Mode.InterMission.SizeX',0
+.data:005C3744                                         ; DATA XREF: WinMain(x,x,x,x)+8E8↑o
+.data:005C3760 aGfxModeIntermi_0 db 'GFX.Mode.InterMission.SizeY',0
+.data:005C3760                                         ; DATA XREF: WinMain(x,x,x,x)+8FA↑o
+.data:005C377C aGfxModeIntermi_1 db 'GFX.Mode.InterMission.BPP',0
+.data:005C377C                                         ; DATA XREF: WinMain(x,x,x,x)+90E↑o
+.data:005C3796                 align 4
+.data:005C3798 aGfxModeIntermi_2 db 'GFX.Mode.InterMission.Stencil',0
+.data:005C3798                                         ; DATA XREF: WinMain(x,x,x,x)+91D↑o
+.data:005C37B6                 align 4
+.data:005C37B8 aGfxModeIntermi_3 db 'GFX.Mode.InterMission.FullScreen',0
+.data:005C37B8                                         ; DATA XREF: WinMain(x,x,x,x)+931↑o
+.data:005C37D9                 align 4
+.data:005C37DC aGfxModeIntermi_4 db 'GFX.Mode.InterMission.Frequency',0
+.data:005C37DC                                         ; DATA XREF: WinMain(x,x,x,x)+945↑o
+.data:005C37FC aGfxModeIntermi_5 db 'GFX.Mode.InterMission.SizeX',0
+.data:005C37FC                                         ; DATA XREF: WinMain(x,x,x,x)+957↑o
+.data:005C3818 aGfxModeCurrent db 'GFX.Mode.Current.SizeX',0
+.data:005C3818                                         ; DATA XREF: WinMain(x,x,x,x)+965↑o
+.data:005C382F                 align 10h
+.data:005C3830 aGfxModeIntermi_6 db 'GFX.Mode.InterMission.SizeY',0
+.data:005C3830                                         ; DATA XREF: WinMain(x,x,x,x)+977↑o
+.data:005C384C aGfxModeCurrent_0 db 'GFX.Mode.Current.SizeY',0
+.data:005C384C                                         ; DATA XREF: WinMain(x,x,x,x)+985↑o
+.data:005C3863                 align 4
+.data:005C3864 aGfxModeIntermi_7 db 'GFX.Mode.InterMission.BPP',0
+.data:005C3864                                         ; DATA XREF: WinMain(x,x,x,x)+999↑o
+.data:005C387E                 align 10h
+.data:005C3880 aGfxModeCurrent_1 db 'GFX.Mode.Current.BPP',0
+.data:005C3880                                         ; DATA XREF: WinMain(x,x,x,x)+9A7↑o
+.data:005C3895                 align 4
+.data:005C3898 aGfxModeIntermi_8 db 'GFX.Mode.InterMission.Stencil',0
+.data:005C3898                                         ; DATA XREF: WinMain(x,x,x,x)+9BB↑o
+.data:005C38B6                 align 4
+.data:005C38B8 aGfxModeCurrent_2 db 'GFX.Mode.Current.Stencil',0
+.data:005C38B8                                         ; DATA XREF: WinMain(x,x,x,x)+9C9↑o
+.data:005C38D1                 align 4
+.data:005C38D4 aGfxModeIntermi_9 db 'GFX.Mode.InterMission.FullScreen',0
+.data:005C38D4                                         ; DATA XREF: WinMain(x,x,x,x)+9DD↑o
+.data:005C38F5                 align 4
+.data:005C38F8 aGfxModeCurrent_3 db 'GFX.Mode.Current.FullScreen',0
+.data:005C38F8                                         ; DATA XREF: WinMain(x,x,x,x)+9EB↑o
+.data:005C3914 aGfxModeIntermi_10 db 'GFX.Mode.InterMission.Frequency',0
+.data:005C3914                                         ; DATA XREF: WinMain(x,x,x,x)+9FF↑o
+.data:005C3934 aGfxModeCurrent_4 db 'GFX.Mode.Current.Frequency',0
+.data:005C3934                                         ; DATA XREF: WinMain(x,x,x,x)+A0D↑o
+.data:005C394F                 align 10h
+.data:005C3950 aConstsTable    db 'consts table',0     ; DATA XREF: WinMain(x,x,x,x)+A29↑o
+.data:005C395D                 align 10h
+.data:005C3960 aBlitzkrieg     db 'blitzkrieg',0       ; DATA XREF: WinMain(x,x,x,x)+A99↑o
+.data:005C396B                 align 4
+.data:005C396C aGamespygamenam db 'GameSpyGameName',0  ; DATA XREF: WinMain(x,x,x,x)+A9E↑o
+.data:005C397C aBlitzkrieg_0   db 'blitzkrieg',0       ; DATA XREF: WinMain(x,x,x,x)+AAB↑o
+.data:005C3987                 align 4
+.data:005C3988 aGamespyenginen db 'GameSpyEngineName',0
+.data:005C3988                                         ; DATA XREF: WinMain(x,x,x,x)+AB0↑o
+.data:005C399A                 align 4
+.data:005C399C aGspBlitzkrieg  db '#GSP!blitzkrieg',0  ; DATA XREF: WinMain(x,x,x,x)+ABD↑o
+.data:005C39AC aGamespychatnam db 'GameSpyChatName',0  ; DATA XREF: WinMain(x,x,x,x)+AC2↑o
+.data:005C39BC aConstsXml_0    db 'consts.xml',0       ; DATA XREF: WinMain(x,x,x,x)+ACF↑o
+.data:005C39C7                 align 4
+.data:005C39C8 aGameversion    db 'GameVersion',0      ; DATA XREF: WinMain(x,x,x,x)+AEE↑o
+.data:005C39D4 aNet            db 'Net',0              ; DATA XREF: WinMain(x,x,x,x)+AF3↑o
+.data:005C39D8 aNetgameversion db 'NetGameVersion',0   ; DATA XREF: WinMain(x,x,x,x)+B10↑o
+.data:005C39E7                 align 4
+.data:005C39E8 ; CHAR aError_0[]
+.data:005C39E8 aError_0        db 'ERROR',0            ; DATA XREF: WinMain(x,x,x,x)+B8A↑o
+.data:005C39EE                 align 10h
+.data:005C39F0 ; CHAR aCanTInitialize[]
+.data:005C39F0 aCanTInitialize db 'Can',27h,'t initialize game...',0
+.data:005C39F0                                         ; DATA XREF: WinMain(x,x,x,x)+B8F↑o
+.data:005C3A09                 align 4
+.data:005C3A0C aGameSystemInit db 'game system init',0 ; DATA XREF: WinMain(x,x,x,x):loc_40350A↑o
+.data:005C3A1D                 align 10h
+.data:005C3A20 aScenariosTutor db 'scenarios\tutorials\;.xml',0
+.data:005C3A20                                         ; DATA XREF: WinMain(x,x,x,x)+C73↑o
+.data:005C3A3A                 align 4
+.data:005C3A3C aTutorial       db 'tutorial',0         ; DATA XREF: WinMain(x,x,x,x)+CB2↑o
+.data:005C3A45                 align 4
+.data:005C3A48 aScenariosCusto db 'scenarios\custom\missions\;.xml',0
+.data:005C3A48                                         ; DATA XREF: WinMain(x,x,x,x)+D17↑o
+.data:005C3A68 aCustomMissions db 'custom_missions',0  ; DATA XREF: WinMain(x,x,x,x)+D56↑o
+.data:005C3A78 aScenariosCusto_0 db 'scenarios\custom\chapters\;.xml',0
+.data:005C3A78                                         ; DATA XREF: WinMain(x,x,x,x)+DBB↑o
+.data:005C3A98 aCustomChapters db 'custom_chapters',0  ; DATA XREF: WinMain(x,x,x,x)+DFA↑o
+.data:005C3AA8 aScenariosCusto_1 db 'scenarios\custom\campaigns\;.xml',0
+.data:005C3AA8                                         ; DATA XREF: WinMain(x,x,x,x)+E5F↑o
+.data:005C3AC9                 align 4
+.data:005C3ACC aCustomCampaign db 'custom_campaigns',0 ; DATA XREF: WinMain(x,x,x,x)+E9E↑o
+.data:005C3ADD                 align 10h
+.data:005C3AE0 aMapsMultiplaye db 'maps\multiplayer\;.xml',0
+.data:005C3AE0                                         ; DATA XREF: WinMain(x,x,x,x)+F03↑o
+.data:005C3AF7                 align 4
+.data:005C3AF8 aMapsMultiplaye_0 db 'maps_multiplayer_xml',0
+.data:005C3AF8                                         ; DATA XREF: WinMain(x,x,x,x)+F42↑o
+.data:005C3B0D                 align 10h
+.data:005C3B10 aMapsMultiplaye_1 db 'maps\multiplayer\;.bzm',0
+.data:005C3B10                                         ; DATA XREF: WinMain(x,x,x,x)+FA7↑o
+.data:005C3B27                 align 4
+.data:005C3B28 aMapsMultiplaye_2 db 'maps_multiplayer_bzm',0
+.data:005C3B28                                         ; DATA XREF: WinMain(x,x,x,x)+FE6↑o
+.data:005C3B3D                 align 10h
+.data:005C3B40 aInspectingStor db 'inspecting storage',0
+.data:005C3B40                                         ; DATA XREF: WinMain(x,x,x,x)+1050↑o
+.data:005C3B53                 align 4
+.data:005C3B54 aGfxModeIntermi_11 db 'GFX.Mode.InterMission.SizeX',0
+.data:005C3B54                                         ; DATA XREF: WinMain(x,x,x,x)+1078↑o
+.data:005C3B70 aGfxModeIntermi_12 db 'GFX.Mode.InterMission.SizeY',0
+.data:005C3B70                                         ; DATA XREF: WinMain(x,x,x,x)+1090↑o
+.data:005C3B8C aGfxModeIntermi_13 db 'GFX.Mode.InterMission.BPP',0
+.data:005C3B8C                                         ; DATA XREF: WinMain(x,x,x,x)+10AA↑o
+.data:005C3BA6                 align 4
+.data:005C3BA8 aGfxModeIntermi_14 db 'GFX.Mode.InterMission.Stencil',0
+.data:005C3BA8                                         ; DATA XREF: WinMain(x,x,x,x)+10BF↑o
+.data:005C3BC6                 align 4
+.data:005C3BC8 aGfxModeIntermi_15 db 'GFX.Mode.InterMission.FullScreen',0
+.data:005C3BC8                                         ; DATA XREF: WinMain(x,x,x,x)+10D9↑o
+.data:005C3BE9                 align 4
+.data:005C3BEC aGfxModeIntermi_16 db 'GFX.Mode.InterMission.Frequency',0
+.data:005C3BEC                                         ; DATA XREF: WinMain(x,x,x,x)+10F3↑o
+.data:005C3C0C aGraphicsInit   db 'graphics init',0    ; DATA XREF: WinMain(x,x,x,x)+124D↑o
+.data:005C3C1A                 align 4
+.data:005C3C1C aAutodetectVide db 'Autodetect.VideoCard',0
+.data:005C3C1C                                         ; DATA XREF: WinMain(x,x,x,x)+127B↑o
+.data:005C3C31                 align 4
+.data:005C3C34 aAutodetectVide_0 db 'Autodetect.VideoCard',0
+.data:005C3C34                                         ; DATA XREF: WinMain(x,x,x,x)+12DF↑o
+.data:005C3C49                 align 4
+.data:005C3C4C ; CHAR aOn[]
+.data:005C3C4C aOn             db 'ON',0               ; DATA XREF: WinMain(x,x,x,x):loc_403C3B↑o
+.data:005C3C4F                 align 10h
+.data:005C3C50 aGfxOptbuffers  db 'GFX.OptBuffers',0   ; DATA XREF: WinMain(x,x,x,x)+1348↑o
+.data:005C3C5F                 align 10h
+.data:005C3C60 aOptionsMultipl db 'Options.Multiplayer.GameSpyServerName',0
+.data:005C3C60                                         ; DATA XREF: WinMain(x,x,x,x)+13E1↑o
+.data:005C3C86                 align 4
+.data:005C3C88 aMultiplayerSer db 'Multiplayer.ServerName',0
+.data:005C3C88                                         ; DATA XREF: WinMain(x,x,x,x)+1464↑o
+.data:005C3C9F                 align 10h
+.data:005C3CA0 aMultiplayerSer_0 db 'Multiplayer.ServerPassword',0
+.data:005C3CA0                                         ; DATA XREF: WinMain(x,x,x,x)+1520↑o
+.data:005C3CBB                 align 4
+.data:005C3CBC aSerializeConfi db 'serialize config',0 ; DATA XREF: WinMain(x,x,x,x)+159B↑o
+.data:005C3CCD                 align 10h
+.data:005C3CD0 aFontsMedium    db 'fonts\medium',0     ; DATA XREF: WinMain(x,x,x,x)+1631↑o
+.data:005C3CDD                 align 10h
+.data:005C3CE0 aSoundStreammas db 'Sound.StreamMasterVolume',0
+.data:005C3CE0                                         ; DATA XREF: WinMain(x,x,x,x)+16BA↑o
+.data:005C3CF9                 align 4
+.data:005C3CFC aSoundEnablesfx db 'Sound.EnableSFX',0  ; DATA XREF: WinMain(x,x,x,x)+16DE↑o
+.data:005C3D0C aSoundEnablestr db 'Sound.EnableStream',0
+.data:005C3D0C                                         ; DATA XREF: WinMain(x,x,x,x)+1706↑o
+.data:005C3D1F                 align 10h
+.data:005C3D20 aExecAutoexecCf db 'Exec( "autoexec.cfg" )',0
+.data:005C3D20                                         ; DATA XREF: WinMain(x,x,x,x)+173E↑o
+.data:005C3D37                 align 4
+.data:005C3D38 aOptionsInit    db 'options init',0     ; DATA XREF: WinMain(x,x,x,x)+177C↑o
+.data:005C3D45                 align 4
+.data:005C3D48 ; char aI[]
+.data:005C3D48 aI              db '%i',0               ; DATA XREF: WinMain(x,x,x,x)+1943↑o
+.data:005C3D4B                 align 4
+.data:005C3D4C ; char aWaitingGalaxyT[]
+.data:005C3D4C aWaitingGalaxyT db 'Waiting galaxy to login',0Ah,0
+.data:005C3D4C                                         ; DATA XREF: WinMain(x,x,x,x)+1B51↑o
+.data:005C3D65                 align 4
+.data:005C3D68 ; char aGalaxyI64u[]
+.data:005C3D68 aGalaxyI64u     db 'galaxy:/%I64u',0    ; DATA XREF: WinMain(x,x,x,x)+1BEA↑o
+.data:005C3D76                 align 4
+.data:005C3D78 ; char aGalaxyAuthoriz[]
+.data:005C3D78 aGalaxyAuthoriz db 'Galaxy authorization timed out',0Ah,0
+.data:005C3D78                                         ; DATA XREF: WinMain(x,x,x,x):loc_40454C↑o
+.data:005C3D98 aMoviesIntro    db 'movies\intro',0     ; DATA XREF: WinMain(x,x,x,x)+1CB5↑o
+.data:005C3DA5                 align 4
+.data:005C3DA8 ; char aSD[]
+.data:005C3DA8 aSD             db '%s;%d',0            ; DATA XREF: WinMain(x,x,x,x)+1CBA↑o
+.data:005C3DAE                 align 10h
+.data:005C3DB0 aMoviesIntroOnl db 'movies\intro_only',0
+.data:005C3DB0                                         ; DATA XREF: WinMain(x,x,x,x)+1D13↑o
+.data:005C3DC2                 align 4
+.data:005C3DC4 aCustomMission  db 'custom_mission',0   ; DATA XREF: WinMain(x,x,x,x)+1D87↑o
+.data:005C3DD3                 align 4
+.data:005C3DD4 aCustomMission_0 db 'custom_mission',0  ; DATA XREF: WinMain(x,x,x,x)+1E19↑o
+.data:005C3DE3                 align 4
+.data:005C3DE4 ; char aSD_0[]
+.data:005C3DE4 aSD_0           db '%s;%d',0            ; DATA XREF: WinMain(x,x,x,x)+1EA2↑o
+.data:005C3DEA                 align 4
+.data:005C3DEC aMoviedir       db 'MovieDir',0         ; DATA XREF: WinMain(x,x,x,x)+1F17↑o
+.data:005C3DF5                 align 4
+.data:005C3DF8 asc_5C3DF8      db 0Ah                  ; DATA XREF: sub_4049BD:loc_404A1E↑o
+.data:005C3DF9                 db 0Dh,9,'" ',0
+.data:005C3DFE                 align 10h
+.data:005C3E00 aXml            db '.xml',0             ; DATA XREF: sub_4049BD+99↑o
+.data:005C3E05                 align 4
+.data:005C3E08 aBzm            db '.bzm',0             ; DATA XREF: sub_4049BD+B9↑o
+.data:005C3E0D                 align 10h
+.data:005C3E10 asc_5C3E10      db 0Ah                  ; DATA XREF: sub_404ACB:loc_404B1E↑o
+.data:005C3E11                 db 0Dh,9,'" ',0
+.data:005C3E16                 align 4
+.data:005C3E18 aBindCfg        db 'bind.cfg',0         ; DATA XREF: sub_404B61+61↑o
+.data:005C3E21                 align 4
+.data:005C3E24 aMapCurrentName db 'Map.Current.Name',0 ; DATA XREF: sub_404B61+292↑o
+.data:005C3E35                 align 4
+.data:005C3E38 aSav            db '.sav',0             ; DATA XREF: sub_404B61+2BE↑o
+.data:005C3E3D                 align 10h
+.data:005C3E40 aFreq           db '-freq',0            ; DATA XREF: sub_404B61:loc_404E7A↑o
+.data:005C3E46                 align 4
+.data:005C3E48 aFreq_0         db 'freq',0             ; DATA XREF: sub_404B61+376↑o
+.data:005C3E4D                 align 10h
+.data:005C3E50 aMp             db '-mp',0              ; DATA XREF: sub_404B61:loc_404EE9↑o
+.data:005C3E54 aMod            db '-mod',0             ; DATA XREF: sub_404B61:loc_404F18↑o
+.data:005C3E59                 align 4
+.data:005C3E5C aWindowed       db '-windowed',0        ; DATA XREF: sub_404B61:loc_404FFA↑o
+.data:005C3E66                 align 4
+.data:005C3E68 a1              db '1',0                ; DATA XREF: sub_404B61+4C6↑o
+.data:005C3E6A                 align 4
+.data:005C3E6C aWindowed_0     db 'windowed',0         ; DATA XREF: sub_404B61+4CB↑o
+.data:005C3E75                 align 4
+.data:005C3E78 aFullscreen     db '-fullscreen',0      ; DATA XREF: sub_404B61:loc_40503E↑o
+.data:005C3E84 a1_0            db '1',0                ; DATA XREF: sub_404B61+50A↑o
+.data:005C3E86                 align 4
+.data:005C3E88 aFullscreen_0   db 'fullscreen',0       ; DATA XREF: sub_404B61+50F↑o
+.data:005C3E93                 align 4
+.data:005C3E94 aAutosave       db '-autosave',0        ; DATA XREF: sub_404B61:loc_405082↑o
+.data:005C3E9E                 align 10h
+.data:005C3EA0 aAutosave_0     db 'autosave',0         ; DATA XREF: sub_404B61+57E↑o
+.data:005C3EA9                 align 4
+.data:005C3EAC aCycled         db '-cycled',0          ; DATA XREF: sub_404B61:loc_4050F1↑o
+.data:005C3EB4 aFps            db '-fps',0             ; DATA XREF: sub_404B61:loc_405120↑o
+.data:005C3EB9                 align 4
+.data:005C3EBC aGuaranteefps   db 'GuaranteeFPS',0     ; DATA XREF: sub_404B61+629↑o
+.data:005C3EC9                 align 4
+.data:005C3ECC aMovie          db '-movie',0           ; DATA XREF: sub_404B61:loc_40519C↑o
+.data:005C3ED3                 align 4
+.data:005C3ED4 aMoviedir_0     db 'MovieDir',0         ; DATA XREF: sub_404B61+712↑o
+.data:005C3EDD                 align 10h
+.data:005C3EE0 aShowscripterr  db '-showscripterr',0   ; DATA XREF: sub_404B61:loc_405291↑o
+.data:005C3EEF                 align 10h
+.data:005C3EF0 aShowscripterro db 'ShowScriptErrors',0 ; DATA XREF: sub_404B61+752↑o
+.data:005C3F01                 align 4
+.data:005C3F04 aSh             db '-sh',0              ; DATA XREF: sub_404B61:loc_4052C5↑o
+.data:005C3F08 aHistoryXml     db 'history.xml',0      ; DATA XREF: sub_404B61+7FD↑o
+.data:005C3F14 aSavehistoryfil db 'SaveHistoryFileName',0
+.data:005C3F14                                         ; DATA XREF: sub_404B61+853↑o
+.data:005C3F28 aLhclient       db '-lhclient',0        ; DATA XREF: sub_404B61:loc_4053D2↑o
+.data:005C3F32                 align 4
+.data:005C3F34 aHistoryXml_0   db 'history.xml',0      ; DATA XREF: sub_404B61+90A↑o
+.data:005C3F40 aLoadhistoryfil db 'LoadHistoryFileName',0
+.data:005C3F40                                         ; DATA XREF: sub_404B61+960↑o
+.data:005C3F54 aHistoryclient  db 'HistoryClient',0    ; DATA XREF: sub_404B61+96F↑o
+.data:005C3F62                 align 4
+.data:005C3F64 aLh             db '-lh',0              ; DATA XREF: sub_404B61:loc_4054EE↑o
+.data:005C3F68 aHistoryXml_1   db 'history.xml',0      ; DATA XREF: sub_404B61+A26↑o
+.data:005C3F74 aLoadhistoryfil_0 db 'LoadHistoryFileName',0
+.data:005C3F74                                         ; DATA XREF: sub_404B61+A7C↑o
+.data:005C3F88 aDatadir_0      db '-datadir',0         ; DATA XREF: sub_404B61:loc_4055FB↑o
+.data:005C3F91                 align 4
+.data:005C3F94 aDatadir_1      db 'DataDir',0          ; DATA XREF: sub_404B61+B2B↑o
+.data:005C3F9C aConnect        db '-connect',0         ; DATA XREF: sub_404B61:loc_4056AA↑o
+.data:005C3FA5                 align 4
+.data:005C3FA8 aConnect_0      db '+connect',0         ; DATA XREF: sub_404B61:loc_405789↑o
+.data:005C3FB1                 align 4
+.data:005C3FB4 ; char Format[]
+.data:005C3FB4 Format          db '%I64u',0            ; DATA XREF: sub_404B61+CF4↑o
+.data:005C3FBA                 align 4
+.data:005C3FBC aOptionsMultipl_0 db 'Options.Multiplayer.GalaxyLobbyID',0
+.data:005C3FBC                                         ; DATA XREF: sub_404B61+D31↑o
+.data:005C3FDE                 align 10h
+.data:005C3FE0 aHost           db '-host',0            ; DATA XREF: sub_404B61:loc_4058B3↑o
+.data:005C3FE6                 align 4
+.data:005C3FE8 aPassword       db '-password',0        ; DATA XREF: sub_404B61:loc_405977↑o
+.data:005C3FF2                 align 4
+.data:005C3FF4 aName           db '-name',0            ; DATA XREF: sub_404B61:loc_405A27↑o
+.data:005C3FFA                 align 4
+.data:005C3FFC aOptionsMultipl_1 db 'Options.Multiplayer.GameSpyPlayerName',0
+.data:005C3FFC                                         ; DATA XREF: sub_404B61+F81↑o
+.data:005C4022                 align 4
+.data:005C4024 aRoom           db '-room',0            ; DATA XREF: sub_404B61:loc_405B12↑o
+.data:005C402A                 align 4
+.data:005C402C aOptionsMultipl_2 db 'Options.Multiplayer.GameSpyServerName',0
+.data:005C402C                                         ; DATA XREF: sub_404B61+1040↑o
+.data:005C4052                 align 4
+.data:005C4054 ; char aD[]
+.data:005C4054 aD              db '%d',0               ; DATA XREF: sub_406340+8↑o
+.data:005C4054                                         ; sub_4277D0+3AA↑o ...
+.data:005C4057                 align 4
+.data:005C4058 aBase_0         db 'base',0             ; DATA XREF: sub_4064B0+45↑o
+.data:005C4058                                         ; sub_40E150+437↑o ...
+.data:005C405D                 align 10h
+.data:005C4060 ; char aTimeMeterForSD[]
+.data:005C4060 aTimeMeterForSD db '*** Time meter for "%s" = %d',0Ah,0
+.data:005C4060                                         ; DATA XREF: sub_406640+B↑o

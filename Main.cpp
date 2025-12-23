@@ -1,26 +1,3 @@
-/*
-    Blitzkrieg 1 binary patcher
-    Fixes the hardcoded resolution limits in Blitzkrieg 1 binaries.
-
-    TESTED ON:
-    https://store.steampowered.com/app/313480
-
-    IMPORTANT:
-    - Stay Windows XP compatible.
-    - Many players still run and compile on older machines.
-    - Target x86 (32-bit) only to match the original game binaries.
-
-    GUIDE:
-	1.) Build this patcher as x86 (32-bit).
-	2.) Put 'gfx.dll' and 'game.exe' in the same folder as this patcher.
-	3.) Run the patcher.
-	4.) It will patch 'GFX.dll' and three versions of 'game_X.exe' for 1080p, 1440p, and 2160p.
-	5.) You can either run one of the patched game versions directly or rename 'game_X.exe' back to 'game.exe' to run it through Steam.
-
-    LICENSE:
-    https://github.com/nival/Blitzkrieg/blob/main/LICENSE.md
-*/
-
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -45,7 +22,7 @@ bool patchGfxDll(const std::string &filename)
     const uint32_t maxHeight = 1000000;
     bool foundPatches = false;
 
-    std::cout << "Patching gfx.dll...\n";
+    std::cout << "Patching GFX.dll...\n";
 
     for (size_t i = 0; i < data.size() - 5; i++)
     {
@@ -85,22 +62,39 @@ bool patchGfxDll(const std::string &filename)
 
     if (!foundPatches)
     {
-        std::cerr << "Error: Could not find resolution limits\n";
+        std::cerr << "Error: Could not find resolution limits...\n";
+        std::cerr << "The file may already be patched or using a modded dll?\n";
         return false;
     }
 
-    std::string outputName = filename.substr(0, filename.find_last_of('.')) + "_patched.dll";
-    std::ofstream outFile(outputName, std::ios::binary);
+    std::string backupName = filename.substr(0, filename.find_last_of('.')) + "_original.dll";
+    std::ofstream backupFile(backupName, std::ios::binary);
+    if (!backupFile)
+    {
+        std::cerr << "Error: Cannot create backup " << backupName << "\n";
+        return false;
+    }
+
+    std::ifstream originalFile(filename, std::ios::binary);
+    std::vector<uint8_t> originalData((std::istreambuf_iterator<char>(originalFile)),
+                                      std::istreambuf_iterator<char>());
+    originalFile.close();
+
+    backupFile.write(reinterpret_cast<const char *>(originalData.data()), originalData.size());
+    backupFile.close();
+    std::cout << "Created backup: " << backupName << "\n";
+
+    std::ofstream outFile(filename, std::ios::binary);
     if (!outFile)
     {
-        std::cerr << "Error: Cannot write to " << outputName << "\n";
+        std::cerr << "Error: Cannot write to " << filename << "\n";
         return false;
     }
 
     outFile.write(reinterpret_cast<const char *>(data.data()), data.size());
     outFile.close();
 
-    std::cout << "Successfully created: " << outputName << "\n\n";
+    std::cout << "Successfully patched: " << filename << "\n\n";
     return true;
 }
 
@@ -120,7 +114,7 @@ bool patchGameExe(const std::string &filename, const std::string &name,
 
     bool foundPatches = false;
 
-    std::cout << "Patching game.exe " << name << " version...\n";
+    std::cout << "Patching Game.exe " << name << " version...\n";
 
     for (size_t i = 0; i < data.size() - 5; i++)
     {
@@ -181,8 +175,8 @@ bool patchGameExe(const std::string &filename, const std::string &name,
 
 int main(int argc, char *argv[])
 {
-    std::string dllPath = "gfx.dll";
-    std::string exePath = "game.exe";
+    std::string dllPath = "GFX.dll";
+    std::string exePath = "Game.exe";
 
     std::ifstream testDll(dllPath);
     std::ifstream testExe(exePath);
@@ -202,29 +196,29 @@ int main(int argc, char *argv[])
 
     std::cout << "Target files: " << dllPath << ", " << exePath << "\n\n";
 
-    if (!patchGfxDll(dllPath))
+    bool gfxSuccess = patchGfxDll(dllPath);
+    if (!gfxSuccess)
     {
-        std::cerr << "\nPatching gfx.dll failed!\n";
+        std::cerr << "\nPatching GFX.dll failed! Cannot continue.\n";
         return 1;
     }
 
-    int successCount = 0;
+    bool allGameExeSuccess = true;
+    allGameExeSuccess &= patchGameExe(exePath, "1080p", 1920, 1080, "_1080p.exe");
+    allGameExeSuccess &= patchGameExe(exePath, "1440p", 2560, 1440, "_1440p.exe");
+    allGameExeSuccess &= patchGameExe(exePath, "2160p", 3840, 2160, "_2160p.exe");
+    // allGameExeSuccess &= patchGameExe(exePath, "4320p", 7680, 4320, "_4320.exe");
 
-    if (patchGameExe(exePath, "1080p", 1920, 1080, "_patched_1080p.exe"))
-        successCount++;
-    if (patchGameExe(exePath, "1440p", 2560, 1440, "_patched_1440p.exe"))
-        successCount++;
-    if (patchGameExe(exePath, "2160p", 3840, 2160, "_patched_2160p.exe"))
-        successCount++;
-
-    if (successCount == 3)
+    if (allGameExeSuccess)
     {
-        std::cout << "Patching completed successfully!\n";
-        std::cout << "You can either run one of the patched game versions directly or rename 'game_X.exe' back to 'game.exe' to run it through Steam.\n";
+        std::cout << "\nPatching completed successfully!\n";
+        std::cout << "Run a patched executable (Game_X.exe) directly, or rename it to Game.exe to launch via Steam.\n";
+        std::cout << "Visit: https://github.com/brian8544/BlitzkriegPatch for more information.\n";
+        return 0;
     }
     else
     {
-        std::cerr << "\nPatching failed!\n";
+        std::cerr << "\nGame.exe patching failed!\n";
         return 1;
     }
 

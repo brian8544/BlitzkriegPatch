@@ -23,13 +23,14 @@ It has always been possible to force higher resolutions by editing `config.cfg` 
 4. Set your desired resolution in-game.
 5. [OPTIONAL] Rename the patched game executable back to `Game.exe`, so you can run it through steam.
 
-## Compiling the Patcher (Optional)
+## Compiling / using the Patcher (Optional)
 
 If you want to build the patcher yourself:
 
 - **Compile the application as x86 (32-bit)**
-
 This is important to avoid unknown issues when working with a 32-bit binaries.
+1. Put the patcher.exe into `SteamFolder\steamapps\common\Blitzkrieg Anthology\Blitzkrieg` & run it.
+2. See installation guide for further information.
 
 ## License
 

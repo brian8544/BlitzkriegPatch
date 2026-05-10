@@ -17,7 +17,7 @@ It has always been possible to force higher resolutions by editing `config.cfg` 
 
 ## Installation Guide (For Players)
 
-1. Download the latest [release](https://github.com/brian8544/BlitzkriegPatch/release).
+1. Download the latest [release](https://github.com/brian8544/BlitzkriegPatch/releases).
 2. Navigate to your Blitzkrieg installation folder: `SteamFolder\steamapps\common\Blitzkrieg Anthology\Blitzkrieg`.
 3. Replace the original files with the mine.
 4. Set your desired resolution in-game.

@@ -1,5 +1,3 @@
-
-
 # Blitzkrieg 1 – Modern Resolution Patch
 
 This project fixes one of the longest-standing issues in **Blitzkrieg 1**: the hardcoded resolution limit that makes the game difficult to play on modern displays.
@@ -15,21 +13,25 @@ It has always been possible to force higher resolutions by editing `config.cfg` 
 ![proof ingame](https://i.imgur.com/75vANI8.jpeg)  
 ![proof menu](https://i.imgur.com/xBQfxua.jpeg)
 
-## Installation Guide (For Players)
-
+## Installation Guide (For Players) 
 1. Download the latest [release](https://github.com/brian8544/BlitzkriegPatch/releases).
-2. Navigate to your Blitzkrieg installation folder: `SteamFolder\steamapps\common\Blitzkrieg Anthology\Blitzkrieg`.
-3. Replace the original files with the mine.
-4. Set your desired resolution in-game.
-5. [OPTIONAL] Rename the patched game executable back to `Game.exe`, so you can run it through steam.
-
-## Compiling / using the Patcher (Optional)
-
-1. Compile the patcher as x86 (32-bit).
-2. Put the patcher.exe into `SteamFolder\steamapps\common\Blitzkrieg Anthology\Blitzkrieg` & run it.
-3. See installation guide for further information.
+2. Open your Blitzkrieg installation folder, usually:
+```text
+SteamFolder\steamapps\common\Blitzkrieg Anthology\Blitzkrieg
+```
+3. Copy the patch DLL into that folder.
+4. Launch the game normally through Steam or `Game.exe`.
+5. A new window pops up, choose your resolution and press **Save**.
+Hold CTRL while launching the game to show the window again.
+  
+## Building
+Build the project as a **Win32/x86 DLL**.
+The DLL must export:
+```text
+GetModuleDescriptor
+```
+Blitzkrieg automatically scans DLLs in the game directory and calls this export when present.
 
 ## License
-
-This project is provided for educational and preservation purposes.  
+This project is provided for educational and preservation purposes.
 All original game assets and binaries belong to their respective owners.

@@ -33,6 +33,7 @@ static HMODULE g_self = NULL;
 static volatile LONG g_started = 0;
 static volatile LONG g_gamePatched = 0;
 static volatile LONG g_gfxPatched = 0;
+static volatile LONG g_gameTTPatched = 0;
 static volatile LONG g_threadStarted = 0;
 
 static ResolutionChoice g_resolution = { 1920, 1080, "1920 x 1080" };
@@ -61,8 +62,165 @@ static const BYTE PATTERN_GFX_HEIGHT_1200[5] = {
 static const DWORD GFX_MAX_WIDTH = 1000000;
 static const DWORD GFX_MAX_HEIGHT = 1000000;
 
+// https://github.com/brian8544/BlitzkriegPatch/issues/2
+// Bug: pUIScreen->Reposition(pGFX->GetScreenRect()) sets a layout made for 1024x768.
+// UI elements are offset due to our higher resolotuions.
+//
+// Fix: Hook each GetScreenRect() callsite & after the real call
+// returns (EAX -> CTRect<long>{x1,y1,x2,y2}), rewrite the rect in place to
+// a 1024x768 box centered in it and continue. Our SCREEN_CENTER_FIXUP does the
+// rewrite and InstallScreenCenterHook does the relocate+hook.
+struct ScreenCenterSite
+{
+    const char* name;
+    DWORD rvaStart;   // RVA (base 0x10000000) of block start
+    DWORD rvaResume;  // RVA right after the GetScreenRect call
+    const BYTE* expectedBytes;
+    SIZE_T length;
+};
+
+static const BYTE SITE_BYTES_MAINMENU[14] = {
+    0x8b, 0x43, 0x6c, 0x8d, 0x4c, 0x24, 0x70, 0x51,
+    0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
+};
+
+static const BYTE SITE_BYTES_CAMPAIGN[17] = {
+    0x8b, 0x46, 0x6c, 0x8d, 0x8c, 0x24, 0xcc, 0x00,
+    0x00, 0x00, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
+};
+
+// CInterfaceCampaign::StartInterface, 2nd Reposition (after SetDescriptionText).
+static const BYTE SITE_BYTES_CAMPAIGN_REFRESH[25] = {
+    0x8b, 0x47, 0x6c, 0x8d, 0x8c, 0x24, 0xe0, 0x00,
+    0x00, 0x00, 0x51, 0x50, 0x8b, 0x10, 0xc6, 0x84,
+    0x24, 0x00, 0x01, 0x00, 0x00, 0x2a, 0xff, 0x52, 0x30
+};
+
+// CInterfaceChapter::Create. Load("ui\\common\\chapter") @ RVA 0x391B4.
+static const BYTE SITE_BYTES_CHAPTER[14] = {
+    0x8b, 0x45, 0x6c, 0x8d, 0x4c, 0x24, 0x2c, 0x51,
+    0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
+};
+
+// CInterfaceChapter, refresh on mission-button/warehouse state change.
+static const BYTE SITE_BYTES_CHAPTER_REFRESH1[14] = {
+    0x8b, 0x47, 0x6c, 0x8d, 0x4c, 0x24, 0x4c, 0x51,
+    0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
+};
+
+// CInterfaceChapter::SetMissionDescription, refresh on mission click.
+static const BYTE SITE_BYTES_CHAPTER_REFRESH2[14] = {
+    0x8d, 0x54, 0x24, 0x68, 0x52, 0x8b, 0x46, 0x6c,
+    0x50, 0x8b, 0x08, 0xff, 0x51, 0x30
+};
+
+// CInterfaceAboutMission::Create. Load("ui\\common\\mission") @ RVA 0x408A7.
+static const BYTE SITE_BYTES_MISSION[17] = {
+    0x8b, 0x46, 0x6c, 0x8d, 0x8c, 0x24, 0x3c, 0x01,
+    0x00, 0x00, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
+};
+
+// CInterfaceAboutMission, refresh after objective flags placed on map.
+static const BYTE SITE_BYTES_MISSION_REFRESH[17] = {
+    0x8d, 0x94, 0x24, 0x3c, 0x01, 0x00, 0x00, 0x52,
+    0x8b, 0x46, 0x6c, 0x50, 0x8b, 0x08, 0xff, 0x51, 0x30
+};
+
+// CInterfaceOptionsSettings::Create. Load("ui\\OptionsSettings" or "ui\\MissionOptionsSettings" depending on AreWeInMission) @ RVA 0x2A71D/0x2A72F.
+static const BYTE SITE_BYTES_OPTIONSSETTINGS[14] = {
+    0x8b, 0x43, 0x6c, 0x8d, 0x54, 0x24, 0x58, 0x52,
+    0x50, 0x8b, 0x08, 0xff, 0x51, 0x30
+};
+
+// CInterfaceMPGamesList::Create (LAN/Internet/GameSpy-Galaxy server browser; one screen for all 3 via EMultiplayerConnectionType) @ RVA 0x16AE5.
+static const BYTE SITE_BYTES_MPGAMESLIST[14] = {
+    0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x3c, 0x51,
+    0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
+};
+
+// CInterfaceMPGamesList, refresh after the eConnType chatbutton switch
+static const BYTE SITE_BYTES_MPGAMESLIST_REFRESH[14] = {
+    0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x4c, 0x51,
+    0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
+};
+
+// CInterfaceMPStartingGame::Create (multiplayer lobby/staging room). Loads ("ui\\MuptiplayerStartingGame") @ RVA 0x199CA.
+static const BYTE SITE_BYTES_MPSTARTINGGAME[14] = {
+    0x8b, 0x46, 0x6c, 0x8d, 0x54, 0x24, 0x24, 0x8b,
+    0x08, 0x52, 0x50, 0xff, 0x51, 0x30
+};
+
+static const BYTE SITE_BYTES_MPCHAT[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x54, 0x24, 0x24, 0x52, 0x50, 0x8b, 0x08, 0xff, 0x51, 0x30 };
+static const BYTE SITE_BYTES_MPCREATEGAME[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x30, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_MPCREATEGAME_REFRESH[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x40, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_MPMAPINVITE[14] = { 0x8b, 0x43, 0x6c, 0x8d, 0x4c, 0x24, 0x4c, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_MPMAPSETTINGS[14] = { 0x8b, 0x47, 0x6c, 0x8d, 0x54, 0x24, 0x2c, 0x52, 0x50, 0x8b, 0x08, 0xff, 0x51, 0x30 };
+static const BYTE SITE_BYTES_ADDRESSBOOK[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x30, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_ADDRESSBOOK_REFRESH[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x40, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_PLAYERSTATS[14] = { 0x8b, 0x43, 0x6c, 0x8d, 0x54, 0x24, 0x60, 0x52, 0x50, 0x8b, 0x08, 0xff, 0x51, 0x30 };
+static const BYTE SITE_BYTES_PLAYERSTATS_REFRESH[14] = { 0x8b, 0x43, 0x6c, 0x8d, 0x54, 0x24, 0x20, 0x52, 0x50, 0x8b, 0x08, 0xff, 0x51, 0x30 };
+static const BYTE SITE_BYTES_UNITSMISSIONPERFORMANCE[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x24, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_UNITSMISSIONPERFORMANCE_REFRESH[22] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x24, 0xc7, 0x44, 0x24, 0x3c, 0xff, 0xff, 0xff, 0xff, 0x8b, 0x10, 0x51, 0x50, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_ADDUNITTOMISSION[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x18, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_ADDUNITTOMISSION_REFRESH[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x18, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_ENCYCLOPEDIA[14] = { 0x8b, 0x47, 0x6c, 0x8d, 0x4c, 0x24, 0x18, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_ENCYCLOPEDIA_REFRESH[14] = { 0x8b, 0x47, 0x6c, 0x8d, 0x4c, 0x24, 0x78, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_STATS[14] = { 0x8b, 0x43, 0x6c, 0x8d, 0x54, 0x24, 0x38, 0x52, 0x50, 0x8b, 0x08, 0xff, 0x51, 0x30 };
+static const BYTE SITE_BYTES_STATS_REFRESH[14] = { 0x8b, 0x43, 0x6c, 0x8d, 0x54, 0x24, 0x50, 0x52, 0x50, 0x8b, 0x08, 0xff, 0x51, 0x30 };
+static const BYTE SITE_BYTES_TOTALENCYCLOPEDIA[14] = { 0x8b, 0x43, 0x6c, 0x8d, 0x4c, 0x24, 0x3c, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH[14] = { 0x8b, 0x43, 0x6c, 0x8d, 0x54, 0x24, 0x4c, 0x52, 0x50, 0x8b, 0x08, 0xff, 0x51, 0x30 };
+static const BYTE SITE_BYTES_WAREHOUSE[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x24, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+static const BYTE SITE_BYTES_WAREHOUSE_REFRESH[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x24, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
+
+static const ScreenCenterSite SCREEN_CENTER_SITES[33] = {
+    { "mainmenu",           0x0003EB48, 0x0003EB56, SITE_BYTES_MAINMENU,           sizeof(SITE_BYTES_MAINMENU)           },
+    { "campaign",           0x00035696, 0x000356A7, SITE_BYTES_CAMPAIGN,           sizeof(SITE_BYTES_CAMPAIGN)           },
+    { "campaign_refresh",   0x00036358, 0x00036371, SITE_BYTES_CAMPAIGN_REFRESH,   sizeof(SITE_BYTES_CAMPAIGN_REFRESH)   },
+    { "chapter",            0x000391BA, 0x000391C8, SITE_BYTES_CHAPTER,            sizeof(SITE_BYTES_CHAPTER)            },
+    { "chapter_refresh1",   0x00039F56, 0x00039F64, SITE_BYTES_CHAPTER_REFRESH1,   sizeof(SITE_BYTES_CHAPTER_REFRESH1)   },
+    { "chapter_refresh2",   0x0003A5FA, 0x0003A608, SITE_BYTES_CHAPTER_REFRESH2,   sizeof(SITE_BYTES_CHAPTER_REFRESH2)   },
+    { "mission",            0x000408AD, 0x000408BE, SITE_BYTES_MISSION,            sizeof(SITE_BYTES_MISSION)            },
+    { "mission_refresh",    0x00041085, 0x00041096, SITE_BYTES_MISSION_REFRESH,    sizeof(SITE_BYTES_MISSION_REFRESH)    },
+    { "optionssettings",    0x0002A735, 0x0002A743, SITE_BYTES_OPTIONSSETTINGS,    sizeof(SITE_BYTES_OPTIONSSETTINGS)    },
+    { "mpgameslist",        0x00016AEB, 0x00016AF9, SITE_BYTES_MPGAMESLIST,        sizeof(SITE_BYTES_MPGAMESLIST)        },
+    { "mpgameslist_refresh",0x00016C6D, 0x00016C7B, SITE_BYTES_MPGAMESLIST_REFRESH,sizeof(SITE_BYTES_MPGAMESLIST_REFRESH)},
+    { "mpstartinggame",     0x00019A95, 0x00019AA3, SITE_BYTES_MPSTARTINGGAME,     sizeof(SITE_BYTES_MPSTARTINGGAME)     },
+    { "mpchat",                       0x0001C732, 0x0001C740, SITE_BYTES_MPCHAT,                       sizeof(SITE_BYTES_MPCHAT)                       },
+    { "mpcreategame",                 0x00021178, 0x00021186, SITE_BYTES_MPCREATEGAME,                 sizeof(SITE_BYTES_MPCREATEGAME)                 },
+    { "mpcreategame_refresh",         0x00021274, 0x00021282, SITE_BYTES_MPCREATEGAME_REFRESH,         sizeof(SITE_BYTES_MPCREATEGAME_REFRESH)         },
+    { "mpmapinvite",                  0x00023F90, 0x00023F9E, SITE_BYTES_MPMAPINVITE,                  sizeof(SITE_BYTES_MPMAPINVITE)                  },
+    { "mpmapsettings",                0x00024E98, 0x00024EA6, SITE_BYTES_MPMAPSETTINGS,                sizeof(SITE_BYTES_MPMAPSETTINGS)                },
+    { "addressbook",                  0x00026732, 0x00026740, SITE_BYTES_ADDRESSBOOK,                  sizeof(SITE_BYTES_ADDRESSBOOK)                  },
+    { "addressbook_refresh",          0x00026797, 0x000267A5, SITE_BYTES_ADDRESSBOOK_REFRESH,          sizeof(SITE_BYTES_ADDRESSBOOK_REFRESH)          },
+    { "playerstats",                  0x00028FFE, 0x0002900C, SITE_BYTES_PLAYERSTATS,                  sizeof(SITE_BYTES_PLAYERSTATS)                  },
+    { "playerstats_refresh",          0x0002976E, 0x0002977C, SITE_BYTES_PLAYERSTATS_REFRESH,          sizeof(SITE_BYTES_PLAYERSTATS_REFRESH)          },
+    { "unitsmissionperformance",      0x0003196D, 0x0003197B, SITE_BYTES_UNITSMISSIONPERFORMANCE,      sizeof(SITE_BYTES_UNITSMISSIONPERFORMANCE)      },
+    { "unitsmissionperformance_refresh", 0x00031A1B, 0x00031A31, SITE_BYTES_UNITSMISSIONPERFORMANCE_REFRESH, sizeof(SITE_BYTES_UNITSMISSIONPERFORMANCE_REFRESH) },
+    { "addunittomission",             0x00034CBD, 0x00034CCB, SITE_BYTES_ADDUNITTOMISSION,             sizeof(SITE_BYTES_ADDUNITTOMISSION)             },
+    { "addunittomission_refresh",     0x00034CFE, 0x00034D0C, SITE_BYTES_ADDUNITTOMISSION_REFRESH,     sizeof(SITE_BYTES_ADDUNITTOMISSION_REFRESH)     },
+    { "encyclopedia",                 0x0003CDC3, 0x0003CDD1, SITE_BYTES_ENCYCLOPEDIA,                 sizeof(SITE_BYTES_ENCYCLOPEDIA)                 },
+    { "encyclopedia_refresh",         0x0003D0A9, 0x0003D0B7, SITE_BYTES_ENCYCLOPEDIA_REFRESH,         sizeof(SITE_BYTES_ENCYCLOPEDIA_REFRESH)         },
+    { "stats",                        0x00045505, 0x00045513, SITE_BYTES_STATS,                        sizeof(SITE_BYTES_STATS)                        },
+    { "stats_refresh",                0x000456F1, 0x000456FF, SITE_BYTES_STATS_REFRESH,                sizeof(SITE_BYTES_STATS_REFRESH)                },
+    { "totalencyclopedia",            0x0004A0B0, 0x0004A0BE, SITE_BYTES_TOTALENCYCLOPEDIA,            sizeof(SITE_BYTES_TOTALENCYCLOPEDIA)            },
+    { "totalencyclopedia_refresh",    0x0004A1D8, 0x0004A1E6, SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH,    sizeof(SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH)    },
+    { "warehouse",                    0x0004C309, 0x0004C317, SITE_BYTES_WAREHOUSE,                    sizeof(SITE_BYTES_WAREHOUSE)                    },
+    { "warehouse_refresh",            0x0004C3A4, 0x0004C3B2, SITE_BYTES_WAREHOUSE_REFRESH,            sizeof(SITE_BYTES_WAREHOUSE_REFRESH)            },
+};
+
+// Fix: EAX -> CTRect<long>{x1,y1,x2,y2}. Centers a 1024x768 box in place. ECX/EDX scratching causwe original code always reloads them fresh afterwards anyway.
+static const BYTE SCREEN_CENTER_FIXUP[55] = {
+    0x8b, 0x48, 0x08, 0x2b, 0x08, 0x81, 0xe9, 0x00, 0x04, 0x00, 0x00,
+    0xd1, 0xf9, 0x01, 0x08, 0x8b, 0x10, 0x81, 0xc2, 0x00, 0x04, 0x00,
+    0x00, 0x89, 0x50, 0x08, 0x8b, 0x48, 0x0c, 0x2b, 0x48, 0x04, 0x81,
+    0xe9, 0x00, 0x03, 0x00, 0x00, 0xd1, 0xf9, 0x01, 0x48, 0x04, 0x8b,
+    0x50, 0x04, 0x81, 0xc2, 0x00, 0x03, 0x00, 0x00, 0x89, 0x50, 0x0c,
+};
+
 static ResolutionChoice g_resolutionList[256];
 static int g_resolutionCount = 0;
+
+
 
 static ResolutionChoice MakeResolution(DWORD w, DWORD h)
 {
@@ -1202,6 +1360,26 @@ static bool WriteUInt32(BYTE* address, DWORD value)
     return true;
 }
 
+static bool WriteBytes(BYTE* address, const BYTE* data, SIZE_T size)
+{
+    if (!address || !data || size == 0)
+        return false;
+
+    DWORD oldProtect = 0;
+
+    if (!VirtualProtect(address, size, PAGE_EXECUTE_READWRITE, &oldProtect))
+        return false;
+
+    memcpy(address, data, size);
+
+    FlushInstructionCache(GetCurrentProcess(), address, size);
+
+    DWORD ignored = 0;
+    VirtualProtect(address, size, oldProtect, &ignored);
+
+    return true;
+}
+
 static int PatchPatternInCodeSections(
     HMODULE module,
     const BYTE* pattern,
@@ -1319,6 +1497,86 @@ static bool PatchGfxIfLoaded()
     return true;
 }
 
+static bool InstallScreenCenterHook(BYTE* moduleBase, const ScreenCenterSite& site)
+{
+    BYTE* siteAddr = moduleBase + site.rvaStart;
+
+    __try
+    {
+        if (!BytesEqual(siteAddr, site.expectedBytes, site.length))
+            return false;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+
+    if (site.length < 5 || site.length > 32)
+        return false;
+
+    SIZE_T trampolineSize = site.length + sizeof(SCREEN_CENTER_FIXUP) + 5;
+
+    BYTE* trampoline = reinterpret_cast<BYTE*>(VirtualAlloc(
+        NULL,
+        trampolineSize,
+        MEM_COMMIT | MEM_RESERVE,
+        PAGE_EXECUTE_READWRITE
+    ));
+
+    if (!trampoline)
+        return false;
+
+    memcpy(trampoline, siteAddr, site.length);
+    memcpy(trampoline + site.length, SCREEN_CENTER_FIXUP, sizeof(SCREEN_CENTER_FIXUP));
+
+    BYTE* jmpBackAt = trampoline + site.length + sizeof(SCREEN_CENTER_FIXUP);
+    BYTE* resumeVa  = moduleBase + site.rvaResume;
+    DWORD jmpBackRel = static_cast<DWORD>(resumeVa - (jmpBackAt + 5));
+
+    jmpBackAt[0] = 0xE9;
+    *reinterpret_cast<DWORD*>(jmpBackAt + 1) = jmpBackRel;
+
+    FlushInstructionCache(GetCurrentProcess(), trampoline, trampolineSize);
+
+    // Overwrite the original site: JMP to trampoline + NOP padding. 32 bytes covers every site > longest is 25 bytes.
+    BYTE hookBuf[32];
+    memset(hookBuf, 0x90, sizeof(hookBuf));
+
+    DWORD jmpInRel = static_cast<DWORD>(trampoline - (siteAddr + 5));
+    hookBuf[0] = 0xE9;
+    *reinterpret_cast<DWORD*>(hookBuf + 1) = jmpInRel;
+
+    return WriteBytes(siteAddr, hookBuf, site.length);
+}
+
+static void PatchGameTTDll(HMODULE gameTT)
+{
+    if (!gameTT)
+        return;
+
+    if (InterlockedCompareExchange(&g_gameTTPatched, 1, 0) != 0)
+        return;
+
+    BYTE* base = reinterpret_cast<BYTE*>(gameTT);
+
+    for (int i = 0; i < 33; ++i)
+        InstallScreenCenterHook(base, SCREEN_CENTER_SITES[i]);
+}
+
+static bool PatchGameTTIfLoaded()
+{
+    HMODULE gameTT = GetModuleHandleA("GameTT.dll");
+
+    if (!gameTT)
+        gameTT = GetModuleHandleA(".\\GameTT.dll");
+
+    if (!gameTT)
+        return false;
+
+    PatchGameTTDll(gameTT);
+    return true;
+}
+
 static void PinSelf()
 {
     HMODULE pinned = NULL;
@@ -1345,22 +1603,32 @@ static DWORD WINAPI GfxPollThread(LPVOID)
     return 0;
 }
 
+static DWORD WINAPI GameTTPollThread(LPVOID)
+{
+    for (int i = 0; i < 10000; ++i)
+    {
+        if (InterlockedCompareExchange(&g_gameTTPatched, 0, 0) != 0)
+            return 0;
+
+        if (PatchGameTTIfLoaded())
+            return 0;
+
+        Sleep(1);
+    }
+
+    return 0;
+}
+
 static void StartGfxThread()
 {
     if (InterlockedCompareExchange(&g_threadStarted, 1, 0) != 0)
         return;
 
-    HANDLE thread = CreateThread(
-        NULL,
-        0,
-        GfxPollThread,
-        NULL,
-        0,
-        NULL
-    );
+    HANDLE thread = CreateThread(NULL, 0, GfxPollThread, NULL, 0, NULL);
+    if (thread) CloseHandle(thread);
 
-    if (thread)
-        CloseHandle(thread);
+    thread = CreateThread(NULL, 0, GameTTPollThread, NULL, 0, NULL);
+    if (thread) CloseHandle(thread);
 }
 
 static void StartPatch()

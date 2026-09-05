@@ -172,40 +172,77 @@ static const BYTE SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH[14] = { 0x8b, 0x43, 0x6c,
 static const BYTE SITE_BYTES_WAREHOUSE[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x24, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
 static const BYTE SITE_BYTES_WAREHOUSE_REFRESH[14] = { 0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x24, 0x51, 0x50, 0x8b, 0x10, 0xff, 0x52, 0x30 };
 
-static const ScreenCenterSite SCREEN_CENTER_SITES[33] = {
-    { "mainmenu",           0x0003EB48, 0x0003EB56, SITE_BYTES_MAINMENU,           sizeof(SITE_BYTES_MAINMENU)           },
-    { "campaign",           0x00035696, 0x000356A7, SITE_BYTES_CAMPAIGN,           sizeof(SITE_BYTES_CAMPAIGN)           },
-    { "campaign_refresh",   0x00036358, 0x00036371, SITE_BYTES_CAMPAIGN_REFRESH,   sizeof(SITE_BYTES_CAMPAIGN_REFRESH)   },
-    { "chapter",            0x000391BA, 0x000391C8, SITE_BYTES_CHAPTER,            sizeof(SITE_BYTES_CHAPTER)            },
-    { "chapter_refresh1",   0x00039F56, 0x00039F64, SITE_BYTES_CHAPTER_REFRESH1,   sizeof(SITE_BYTES_CHAPTER_REFRESH1)   },
-    { "chapter_refresh2",   0x0003A5FA, 0x0003A608, SITE_BYTES_CHAPTER_REFRESH2,   sizeof(SITE_BYTES_CHAPTER_REFRESH2)   },
-    { "mission",            0x000408AD, 0x000408BE, SITE_BYTES_MISSION,            sizeof(SITE_BYTES_MISSION)            },
-    { "mission_refresh",    0x00041085, 0x00041096, SITE_BYTES_MISSION_REFRESH,    sizeof(SITE_BYTES_MISSION_REFRESH)    },
-    { "optionssettings",    0x0002A735, 0x0002A743, SITE_BYTES_OPTIONSSETTINGS,    sizeof(SITE_BYTES_OPTIONSSETTINGS)    },
-    { "mpgameslist",        0x00016AEB, 0x00016AF9, SITE_BYTES_MPGAMESLIST,        sizeof(SITE_BYTES_MPGAMESLIST)        },
-    { "mpgameslist_refresh",0x00016C6D, 0x00016C7B, SITE_BYTES_MPGAMESLIST_REFRESH,sizeof(SITE_BYTES_MPGAMESLIST_REFRESH)},
-    { "mpstartinggame",     0x00019A95, 0x00019AA3, SITE_BYTES_MPSTARTINGGAME,     sizeof(SITE_BYTES_MPSTARTINGGAME)     },
-    { "mpchat",                       0x0001C732, 0x0001C740, SITE_BYTES_MPCHAT,                       sizeof(SITE_BYTES_MPCHAT)                       },
-    { "mpcreategame",                 0x00021178, 0x00021186, SITE_BYTES_MPCREATEGAME,                 sizeof(SITE_BYTES_MPCREATEGAME)                 },
-    { "mpcreategame_refresh",         0x00021274, 0x00021282, SITE_BYTES_MPCREATEGAME_REFRESH,         sizeof(SITE_BYTES_MPCREATEGAME_REFRESH)         },
-    { "mpmapinvite",                  0x00023F90, 0x00023F9E, SITE_BYTES_MPMAPINVITE,                  sizeof(SITE_BYTES_MPMAPINVITE)                  },
-    { "mpmapsettings",                0x00024E98, 0x00024EA6, SITE_BYTES_MPMAPSETTINGS,                sizeof(SITE_BYTES_MPMAPSETTINGS)                },
-    { "addressbook",                  0x00026732, 0x00026740, SITE_BYTES_ADDRESSBOOK,                  sizeof(SITE_BYTES_ADDRESSBOOK)                  },
-    { "addressbook_refresh",          0x00026797, 0x000267A5, SITE_BYTES_ADDRESSBOOK_REFRESH,          sizeof(SITE_BYTES_ADDRESSBOOK_REFRESH)          },
-    { "playerstats",                  0x00028FFE, 0x0002900C, SITE_BYTES_PLAYERSTATS,                  sizeof(SITE_BYTES_PLAYERSTATS)                  },
-    { "playerstats_refresh",          0x0002976E, 0x0002977C, SITE_BYTES_PLAYERSTATS_REFRESH,          sizeof(SITE_BYTES_PLAYERSTATS_REFRESH)          },
-    { "unitsmissionperformance",      0x0003196D, 0x0003197B, SITE_BYTES_UNITSMISSIONPERFORMANCE,      sizeof(SITE_BYTES_UNITSMISSIONPERFORMANCE)      },
+// MD5: 619e8c342dc609b68384320acbc02a94
+static const ScreenCenterSite SITES_STEAM_GOG[] = {
+    { "mainmenu",                        0x0003EB48, 0x0003EB56, SITE_BYTES_MAINMENU,                        sizeof(SITE_BYTES_MAINMENU)                        },
+    { "campaign",                        0x00035696, 0x000356A7, SITE_BYTES_CAMPAIGN,                        sizeof(SITE_BYTES_CAMPAIGN)                        },
+    { "campaign_refresh",                0x00036358, 0x00036371, SITE_BYTES_CAMPAIGN_REFRESH,                sizeof(SITE_BYTES_CAMPAIGN_REFRESH)                },
+    { "chapter",                         0x000391BA, 0x000391C8, SITE_BYTES_CHAPTER,                         sizeof(SITE_BYTES_CHAPTER)                         },
+    { "chapter_refresh1",                0x00039F56, 0x00039F64, SITE_BYTES_CHAPTER_REFRESH1,                sizeof(SITE_BYTES_CHAPTER_REFRESH1)                },
+    { "chapter_refresh2",                0x0003A5FA, 0x0003A608, SITE_BYTES_CHAPTER_REFRESH2,                sizeof(SITE_BYTES_CHAPTER_REFRESH2)                },
+    { "mission",                         0x000408AD, 0x000408BE, SITE_BYTES_MISSION,                         sizeof(SITE_BYTES_MISSION)                         },
+    { "mission_refresh",                 0x00041085, 0x00041096, SITE_BYTES_MISSION_REFRESH,                 sizeof(SITE_BYTES_MISSION_REFRESH)                 },
+    { "optionssettings",                 0x0002A735, 0x0002A743, SITE_BYTES_OPTIONSSETTINGS,                 sizeof(SITE_BYTES_OPTIONSSETTINGS)                 },
+    { "mpgameslist",                     0x00016AEB, 0x00016AF9, SITE_BYTES_MPGAMESLIST,                     sizeof(SITE_BYTES_MPGAMESLIST)                     },
+    { "mpgameslist_refresh",             0x00016C6D, 0x00016C7B, SITE_BYTES_MPGAMESLIST_REFRESH,             sizeof(SITE_BYTES_MPGAMESLIST_REFRESH)             },
+    { "mpstartinggame",                  0x00019A95, 0x00019AA3, SITE_BYTES_MPSTARTINGGAME,                  sizeof(SITE_BYTES_MPSTARTINGGAME)                  },
+    { "mpchat",                          0x0001C732, 0x0001C740, SITE_BYTES_MPCHAT,                          sizeof(SITE_BYTES_MPCHAT)                          },
+    { "mpcreategame",                    0x00021178, 0x00021186, SITE_BYTES_MPCREATEGAME,                    sizeof(SITE_BYTES_MPCREATEGAME)                    },
+    { "mpcreategame_refresh",            0x00021274, 0x00021282, SITE_BYTES_MPCREATEGAME_REFRESH,            sizeof(SITE_BYTES_MPCREATEGAME_REFRESH)            },
+    { "mpmapinvite",                     0x00023F90, 0x00023F9E, SITE_BYTES_MPMAPINVITE,                     sizeof(SITE_BYTES_MPMAPINVITE)                     },
+    { "mpmapsettings",                   0x00024E98, 0x00024EA6, SITE_BYTES_MPMAPSETTINGS,                   sizeof(SITE_BYTES_MPMAPSETTINGS)                   },
+    { "addressbook",                     0x00026732, 0x00026740, SITE_BYTES_ADDRESSBOOK,                     sizeof(SITE_BYTES_ADDRESSBOOK)                     },
+    { "addressbook_refresh",             0x00026797, 0x000267A5, SITE_BYTES_ADDRESSBOOK_REFRESH,             sizeof(SITE_BYTES_ADDRESSBOOK_REFRESH)             },
+    { "playerstats",                     0x00028FFE, 0x0002900C, SITE_BYTES_PLAYERSTATS,                     sizeof(SITE_BYTES_PLAYERSTATS)                     },
+    { "playerstats_refresh",             0x0002976E, 0x0002977C, SITE_BYTES_PLAYERSTATS_REFRESH,             sizeof(SITE_BYTES_PLAYERSTATS_REFRESH)             },
+    { "unitsmissionperformance",         0x0003196D, 0x0003197B, SITE_BYTES_UNITSMISSIONPERFORMANCE,         sizeof(SITE_BYTES_UNITSMISSIONPERFORMANCE)         },
     { "unitsmissionperformance_refresh", 0x00031A1B, 0x00031A31, SITE_BYTES_UNITSMISSIONPERFORMANCE_REFRESH, sizeof(SITE_BYTES_UNITSMISSIONPERFORMANCE_REFRESH) },
-    { "addunittomission",             0x00034CBD, 0x00034CCB, SITE_BYTES_ADDUNITTOMISSION,             sizeof(SITE_BYTES_ADDUNITTOMISSION)             },
-    { "addunittomission_refresh",     0x00034CFE, 0x00034D0C, SITE_BYTES_ADDUNITTOMISSION_REFRESH,     sizeof(SITE_BYTES_ADDUNITTOMISSION_REFRESH)     },
-    { "encyclopedia",                 0x0003CDC3, 0x0003CDD1, SITE_BYTES_ENCYCLOPEDIA,                 sizeof(SITE_BYTES_ENCYCLOPEDIA)                 },
-    { "encyclopedia_refresh",         0x0003D0A9, 0x0003D0B7, SITE_BYTES_ENCYCLOPEDIA_REFRESH,         sizeof(SITE_BYTES_ENCYCLOPEDIA_REFRESH)         },
-    { "stats",                        0x00045505, 0x00045513, SITE_BYTES_STATS,                        sizeof(SITE_BYTES_STATS)                        },
-    { "stats_refresh",                0x000456F1, 0x000456FF, SITE_BYTES_STATS_REFRESH,                sizeof(SITE_BYTES_STATS_REFRESH)                },
-    { "totalencyclopedia",            0x0004A0B0, 0x0004A0BE, SITE_BYTES_TOTALENCYCLOPEDIA,            sizeof(SITE_BYTES_TOTALENCYCLOPEDIA)            },
-    { "totalencyclopedia_refresh",    0x0004A1D8, 0x0004A1E6, SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH,    sizeof(SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH)    },
-    { "warehouse",                    0x0004C309, 0x0004C317, SITE_BYTES_WAREHOUSE,                    sizeof(SITE_BYTES_WAREHOUSE)                    },
-    { "warehouse_refresh",            0x0004C3A4, 0x0004C3B2, SITE_BYTES_WAREHOUSE_REFRESH,            sizeof(SITE_BYTES_WAREHOUSE_REFRESH)            },
+    { "addunittomission",                0x00034CBD, 0x00034CCB, SITE_BYTES_ADDUNITTOMISSION,                sizeof(SITE_BYTES_ADDUNITTOMISSION)                },
+    { "addunittomission_refresh",        0x00034CFE, 0x00034D0C, SITE_BYTES_ADDUNITTOMISSION_REFRESH,        sizeof(SITE_BYTES_ADDUNITTOMISSION_REFRESH)        },
+    { "encyclopedia",                    0x0003CDC3, 0x0003CDD1, SITE_BYTES_ENCYCLOPEDIA,                    sizeof(SITE_BYTES_ENCYCLOPEDIA)                    },
+    { "encyclopedia_refresh",            0x0003D0A9, 0x0003D0B7, SITE_BYTES_ENCYCLOPEDIA_REFRESH,            sizeof(SITE_BYTES_ENCYCLOPEDIA_REFRESH)            },
+    { "stats",                           0x00045505, 0x00045513, SITE_BYTES_STATS,                           sizeof(SITE_BYTES_STATS)                           },
+    { "stats_refresh",                   0x000456F1, 0x000456FF, SITE_BYTES_STATS_REFRESH,                   sizeof(SITE_BYTES_STATS_REFRESH)                   },
+    { "totalencyclopedia",               0x0004A0B0, 0x0004A0BE, SITE_BYTES_TOTALENCYCLOPEDIA,               sizeof(SITE_BYTES_TOTALENCYCLOPEDIA)               },
+    { "totalencyclopedia_refresh",       0x0004A1D8, 0x0004A1E6, SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH,       sizeof(SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH)       },
+    { "warehouse",                       0x0004C309, 0x0004C317, SITE_BYTES_WAREHOUSE,                       sizeof(SITE_BYTES_WAREHOUSE)                       },
+    { "warehouse_refresh",               0x0004C3A4, 0x0004C3B2, SITE_BYTES_WAREHOUSE_REFRESH,               sizeof(SITE_BYTES_WAREHOUSE_REFRESH)               },
+};
+
+// MD5: aba28ef985ea0249db5a700d5c1b3129
+// Missing: mpgameslist and mpmapinvite?
+static const ScreenCenterSite SITES_RETAIL_2003[] = {
+    { "mainmenu",                        0x0003d368, 0x0003d376, SITE_BYTES_MAINMENU,                        sizeof(SITE_BYTES_MAINMENU)                        },
+    { "campaign",                        0x00033ec6, 0x00033ed7, SITE_BYTES_CAMPAIGN,                        sizeof(SITE_BYTES_CAMPAIGN)                        },
+    { "campaign_refresh",                0x00034b88, 0x00034ba1, SITE_BYTES_CAMPAIGN_REFRESH,                sizeof(SITE_BYTES_CAMPAIGN_REFRESH)                },
+    { "chapter",                         0x000379ba, 0x000379c8, SITE_BYTES_CHAPTER,                         sizeof(SITE_BYTES_CHAPTER)                         },
+    { "chapter_refresh1",                0x00038756, 0x00038764, SITE_BYTES_CHAPTER_REFRESH1,                sizeof(SITE_BYTES_CHAPTER_REFRESH1)                },
+    { "chapter_refresh2",                0x00038dfa, 0x00038e08, SITE_BYTES_CHAPTER_REFRESH2,                sizeof(SITE_BYTES_CHAPTER_REFRESH2)                },
+    { "mission",                         0x0003f0cd, 0x0003f0de, SITE_BYTES_MISSION,                         sizeof(SITE_BYTES_MISSION)                         },
+    { "mission_refresh",                 0x0003f8a5, 0x0003f8b6, SITE_BYTES_MISSION_REFRESH,                 sizeof(SITE_BYTES_MISSION_REFRESH)                 },
+    { "optionssettings",                 0x00028f25, 0x00028f33, SITE_BYTES_OPTIONSSETTINGS,                 sizeof(SITE_BYTES_OPTIONSSETTINGS)                 },
+    { "mpgameslist_refresh",             0x000b5d7a, 0x000b5d88, SITE_BYTES_MPGAMESLIST_REFRESH,             sizeof(SITE_BYTES_MPGAMESLIST_REFRESH)             },
+    { "mpstartinggame",                  0x00019ce5, 0x00019cf3, SITE_BYTES_MPSTARTINGGAME,                  sizeof(SITE_BYTES_MPSTARTINGGAME)                  },
+    { "mpchat",                          0x0001c842, 0x0001c850, SITE_BYTES_MPCHAT,                          sizeof(SITE_BYTES_MPCHAT)                          },
+    { "mpcreategame",                    0x000212a8, 0x000212b6, SITE_BYTES_MPCREATEGAME,                    sizeof(SITE_BYTES_MPCREATEGAME)                    },
+    { "mpcreategame_refresh",            0x000213a4, 0x000213b2, SITE_BYTES_MPCREATEGAME_REFRESH,            sizeof(SITE_BYTES_MPCREATEGAME_REFRESH)            },
+    { "mpmapsettings",                   0x00023eb8, 0x00023ec6, SITE_BYTES_MPMAPSETTINGS,                   sizeof(SITE_BYTES_MPMAPSETTINGS)                   },
+    { "addressbook",                     0x00025752, 0x00025760, SITE_BYTES_ADDRESSBOOK,                     sizeof(SITE_BYTES_ADDRESSBOOK)                     },
+    { "addressbook_refresh",             0x000257b7, 0x000257c5, SITE_BYTES_ADDRESSBOOK_REFRESH,             sizeof(SITE_BYTES_ADDRESSBOOK_REFRESH)             },
+    { "playerstats",                     0x000277ee, 0x000277fc, SITE_BYTES_PLAYERSTATS,                     sizeof(SITE_BYTES_PLAYERSTATS)                     },
+    { "playerstats_refresh",             0x00027f5e, 0x00027f6c, SITE_BYTES_PLAYERSTATS_REFRESH,             sizeof(SITE_BYTES_PLAYERSTATS_REFRESH)             },
+    { "unitsmissionperformance",         0x000301bd, 0x000301cb, SITE_BYTES_UNITSMISSIONPERFORMANCE,         sizeof(SITE_BYTES_UNITSMISSIONPERFORMANCE)         },
+    { "unitsmissionperformance_refresh", 0x0003026b, 0x00030281, SITE_BYTES_UNITSMISSIONPERFORMANCE_REFRESH, sizeof(SITE_BYTES_UNITSMISSIONPERFORMANCE_REFRESH) },
+    { "addunittomission",                0x000334ed, 0x000334fb, SITE_BYTES_ADDUNITTOMISSION,                sizeof(SITE_BYTES_ADDUNITTOMISSION)                },
+    { "addunittomission_refresh",        0x0003352e, 0x0003353c, SITE_BYTES_ADDUNITTOMISSION_REFRESH,        sizeof(SITE_BYTES_ADDUNITTOMISSION_REFRESH)        },
+    { "encyclopedia",                    0x0003b5e3, 0x0003b5f1, SITE_BYTES_ENCYCLOPEDIA,                    sizeof(SITE_BYTES_ENCYCLOPEDIA)                    },
+    { "encyclopedia_refresh",            0x0003b8c9, 0x0003b8d7, SITE_BYTES_ENCYCLOPEDIA_REFRESH,            sizeof(SITE_BYTES_ENCYCLOPEDIA_REFRESH)            },
+    { "stats",                           0x00043ce5, 0x00043cf3, SITE_BYTES_STATS,                           sizeof(SITE_BYTES_STATS)                           },
+    { "stats_refresh",                   0x00043ed1, 0x00043edf, SITE_BYTES_STATS_REFRESH,                   sizeof(SITE_BYTES_STATS_REFRESH)                   },
+    { "totalencyclopedia",               0x00048a00, 0x00048a0e, SITE_BYTES_TOTALENCYCLOPEDIA,               sizeof(SITE_BYTES_TOTALENCYCLOPEDIA)               },
+    { "totalencyclopedia_refresh",       0x00048b28, 0x00048b36, SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH,       sizeof(SITE_BYTES_TOTALENCYCLOPEDIA_REFRESH)       },
+    { "warehouse",                       0x0004abe9, 0x0004abf7, SITE_BYTES_WAREHOUSE,                       sizeof(SITE_BYTES_WAREHOUSE)                       },
+    { "warehouse_refresh",               0x0004ac84, 0x0004ac92, SITE_BYTES_WAREHOUSE_REFRESH,               sizeof(SITE_BYTES_WAREHOUSE_REFRESH)               },
 };
 
 // Fix: EAX -> CTRect<long>{x1,y1,x2,y2}. Centers a 1024x768 box in place. ECX/EDX scratching causwe original code always reloads them fresh afterwards anyway.
@@ -1549,6 +1586,21 @@ static bool InstallScreenCenterHook(BYTE* moduleBase, const ScreenCenterSite& si
     return WriteBytes(siteAddr, hookBuf, site.length);
 }
 
+static void ApplySites(BYTE* base, const ScreenCenterSite* sites, int count, const char* buildName)
+{
+    int fail = 0;
+    for (int i = 0; i < count; ++i)
+        if (!InstallScreenCenterHook(base, sites[i]))
+            ++fail;
+
+    if (fail > 0)
+    {
+        char msg[128];
+        wsprintfA(msg, "%s: %d/%d hooks failed.", buildName, fail, count);
+        MessageBoxA(NULL, msg, "BlitzkriegPatch", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+    }
+}
+
 static void PatchGameTTDll(HMODULE gameTT)
 {
     if (!gameTT)
@@ -1557,10 +1609,28 @@ static void PatchGameTTDll(HMODULE gameTT)
     if (InterlockedCompareExchange(&g_gameTTPatched, 1, 0) != 0)
         return;
 
-    BYTE* base = reinterpret_cast<BYTE*>(gameTT);
+    BYTE* base;
+    PIMAGE_NT_HEADERS32 nt;
+    if (!GetModuleHeaders(gameTT, &base, &nt))
+        return;
 
-    for (int i = 0; i < 33; ++i)
-        InstallScreenCenterHook(base, SCREEN_CENTER_SITES[i]);
+    DWORD ts = nt->FileHeader.TimeDateStamp;
+
+    if (ts == 0x58F571E9)
+        ApplySites(base, SITES_STEAM_GOG, ARRAYSIZE(SITES_STEAM_GOG), "Steam/GOG");
+    else if (ts == 0x3EC38C2F)
+        ApplySites(base, SITES_RETAIL_2003, ARRAYSIZE(SITES_RETAIL_2003), "Retail 2003");
+    else
+    {
+        char msg[256];
+        wsprintfA(msg,
+            "Unsupported GameTT.dll (timestamp: 0x%08x).\n\n"
+            "Make sure you have applied the 1.2 update, then try again.\n\n"
+            "If the issue persists, open a report at:\n"
+            "https://github.com/brian8544/BlitzkriegPatch",
+            ts);
+        MessageBoxA(NULL, msg, "BlitzkriegPatch", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+    }
 }
 
 static bool PatchGameTTIfLoaded()

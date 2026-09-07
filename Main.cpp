@@ -145,6 +145,16 @@ static const BYTE SITE_BYTES_MPGAMESLIST_REFRESH[14] = {
     0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
 };
 
+// Retail 2003 uses a different stack offset (0x38/0x48 vs 0x3c/0x4c in Steam)
+static const BYTE SITE_BYTES_MPGAMESLIST_RU[14] = {
+    0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x38, 0x51,
+    0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
+};
+static const BYTE SITE_BYTES_MPGAMESLIST_REFRESH_RU[14] = {
+    0x8b, 0x46, 0x6c, 0x8d, 0x4c, 0x24, 0x48, 0x51,
+    0x50, 0x8b, 0x10, 0xff, 0x52, 0x30
+};
+
 // CInterfaceMPStartingGame::Create (multiplayer lobby/staging room). Loads ("ui\\MuptiplayerStartingGame") @ RVA 0x199CA.
 static const BYTE SITE_BYTES_MPSTARTINGGAME[14] = {
     0x8b, 0x46, 0x6c, 0x8d, 0x54, 0x24, 0x24, 0x8b,
@@ -211,7 +221,6 @@ static const ScreenCenterSite SITES_STEAM_GOG[] = {
 };
 
 // MD5: aba28ef985ea0249db5a700d5c1b3129
-// Missing: mpgameslist and mpmapinvite?
 static const ScreenCenterSite SITES_RETAIL_2003[] = {
     { "mainmenu",                        0x0003d368, 0x0003d376, SITE_BYTES_MAINMENU,                        sizeof(SITE_BYTES_MAINMENU)                        },
     { "campaign",                        0x00033ec6, 0x00033ed7, SITE_BYTES_CAMPAIGN,                        sizeof(SITE_BYTES_CAMPAIGN)                        },
@@ -220,6 +229,8 @@ static const ScreenCenterSite SITES_RETAIL_2003[] = {
     { "chapter_refresh1",                0x00038756, 0x00038764, SITE_BYTES_CHAPTER_REFRESH1,                sizeof(SITE_BYTES_CHAPTER_REFRESH1)                },
     { "chapter_refresh2",                0x00038dfa, 0x00038e08, SITE_BYTES_CHAPTER_REFRESH2,                sizeof(SITE_BYTES_CHAPTER_REFRESH2)                },
     { "mission",                         0x0003f0cd, 0x0003f0de, SITE_BYTES_MISSION,                         sizeof(SITE_BYTES_MISSION)                         },
+    { "mpgameslist",                     0x00016bab, 0x00016bb9, SITE_BYTES_MPGAMESLIST_RU,                  sizeof(SITE_BYTES_MPGAMESLIST_RU)                  },
+    { "mpgameslist_refresh",             0x00016d5f, 0x00016d6d, SITE_BYTES_MPGAMESLIST_REFRESH_RU,          sizeof(SITE_BYTES_MPGAMESLIST_REFRESH_RU)          },
     { "mission_refresh",                 0x0003f8a5, 0x0003f8b6, SITE_BYTES_MISSION_REFRESH,                 sizeof(SITE_BYTES_MISSION_REFRESH)                 },
     { "optionssettings",                 0x00028f25, 0x00028f33, SITE_BYTES_OPTIONSSETTINGS,                 sizeof(SITE_BYTES_OPTIONSSETTINGS)                 },
 

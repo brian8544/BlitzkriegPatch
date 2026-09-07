@@ -63,12 +63,13 @@ static const DWORD GFX_MAX_WIDTH = 1000000;
 static const DWORD GFX_MAX_HEIGHT = 1000000;
 
 // https://github.com/brian8544/BlitzkriegPatch/issues/2
+// https://github.com/brian8544/BlitzkriegPatch/issues/3
 // Bug: pUIScreen->Reposition(pGFX->GetScreenRect()) sets a layout made for 1024x768.
 // UI elements are offset due to our higher resolotuions.
 //
 // Fix: Hook each GetScreenRect() callsite & after the real call
 // returns (EAX -> CTRect<long>{x1,y1,x2,y2}), rewrite the rect in place to
-// a 1024x768 box centered in it and continue. Our SCREEN_CENTER_FIXUP does the
+// a 1024x768 box centered in it and continue. Afterwrads BuildFixup generates the
 // rewrite and InstallScreenCenterHook does the relocate+hook.
 struct ScreenCenterSite
 {
@@ -221,7 +222,7 @@ static const ScreenCenterSite SITES_RETAIL_2003[] = {
     { "mission",                         0x0003f0cd, 0x0003f0de, SITE_BYTES_MISSION,                         sizeof(SITE_BYTES_MISSION)                         },
     { "mission_refresh",                 0x0003f8a5, 0x0003f8b6, SITE_BYTES_MISSION_REFRESH,                 sizeof(SITE_BYTES_MISSION_REFRESH)                 },
     { "optionssettings",                 0x00028f25, 0x00028f33, SITE_BYTES_OPTIONSSETTINGS,                 sizeof(SITE_BYTES_OPTIONSSETTINGS)                 },
-    { "mpgameslist_refresh",             0x000b5d7a, 0x000b5d88, SITE_BYTES_MPGAMESLIST_REFRESH,             sizeof(SITE_BYTES_MPGAMESLIST_REFRESH)             },
+
     { "mpstartinggame",                  0x00019ce5, 0x00019cf3, SITE_BYTES_MPSTARTINGGAME,                  sizeof(SITE_BYTES_MPSTARTINGGAME)                  },
     { "mpchat",                          0x0001c842, 0x0001c850, SITE_BYTES_MPCHAT,                          sizeof(SITE_BYTES_MPCHAT)                          },
     { "mpcreategame",                    0x000212a8, 0x000212b6, SITE_BYTES_MPCREATEGAME,                    sizeof(SITE_BYTES_MPCREATEGAME)                    },
@@ -245,14 +246,41 @@ static const ScreenCenterSite SITES_RETAIL_2003[] = {
     { "warehouse_refresh",               0x0004ac84, 0x0004ac92, SITE_BYTES_WAREHOUSE_REFRESH,               sizeof(SITE_BYTES_WAREHOUSE_REFRESH)               },
 };
 
-// Fix: EAX -> CTRect<long>{x1,y1,x2,y2}. Centers a 1024x768 box in place. ECX/EDX scratching causwe original code always reloads them fresh afterwards anyway.
-static const BYTE SCREEN_CENTER_FIXUP[55] = {
-    0x8b, 0x48, 0x08, 0x2b, 0x08, 0x81, 0xe9, 0x00, 0x04, 0x00, 0x00,
-    0xd1, 0xf9, 0x01, 0x08, 0x8b, 0x10, 0x81, 0xc2, 0x00, 0x04, 0x00,
-    0x00, 0x89, 0x50, 0x08, 0x8b, 0x48, 0x0c, 0x2b, 0x48, 0x04, 0x81,
-    0xe9, 0x00, 0x03, 0x00, 0x00, 0xd1, 0xf9, 0x01, 0x48, 0x04, 0x8b,
-    0x50, 0x04, 0x81, 0xc2, 0x00, 0x03, 0x00, 0x00, 0x89, 0x50, 0x0c,
-};
+static LONG g_rectBuf[4];
+
+static void BuildFixup(BYTE* dst, DWORD bufAddr)
+{
+    int i = 0;
+    dst[i++]=0xBA; memcpy(&dst[i],&bufAddr,4); i+=4; // mov edx, &g_rectBuf
+    dst[i++]=0x8b; dst[i++]=0x08;                    // mov ecx,[eax]
+    dst[i++]=0x89; dst[i++]=0x0a;                    // mov [edx],ecx
+    dst[i++]=0x8b; dst[i++]=0x48; dst[i++]=0x04;     // mov ecx,[eax+4]
+    dst[i++]=0x89; dst[i++]=0x4a; dst[i++]=0x04;     // mov [edx+4],ecx
+    dst[i++]=0x8b; dst[i++]=0x48; dst[i++]=0x08;     // mov ecx,[eax+8]
+    dst[i++]=0x89; dst[i++]=0x4a; dst[i++]=0x08;     // mov [edx+8],ecx
+    dst[i++]=0x8b; dst[i++]=0x48; dst[i++]=0x0c;     // mov ecx,[eax+0xc]
+    dst[i++]=0x89; dst[i++]=0x4a; dst[i++]=0x0c;     // mov [edx+0xc],ecx
+    dst[i++]=0x8b; dst[i++]=0xc2;                    // mov eax,edx
+    // Center x
+    dst[i++]=0x8b; dst[i++]=0x48; dst[i++]=0x08;
+    dst[i++]=0x2b; dst[i++]=0x08;
+    dst[i++]=0x81; dst[i++]=0xe9; dst[i++]=0x00; dst[i++]=0x04; dst[i++]=0x00; dst[i++]=0x00;
+    dst[i++]=0xd1; dst[i++]=0xf9;
+    dst[i++]=0x01; dst[i++]=0x08;
+    dst[i++]=0x8b; dst[i++]=0x10;
+    dst[i++]=0x81; dst[i++]=0xc2; dst[i++]=0x00; dst[i++]=0x04; dst[i++]=0x00; dst[i++]=0x00;
+    dst[i++]=0x89; dst[i++]=0x50; dst[i++]=0x08;
+    // Center y
+    dst[i++]=0x8b; dst[i++]=0x48; dst[i++]=0x0c;
+    dst[i++]=0x2b; dst[i++]=0x48; dst[i++]=0x04;
+    dst[i++]=0x81; dst[i++]=0xe9; dst[i++]=0x00; dst[i++]=0x03; dst[i++]=0x00; dst[i++]=0x00;
+    dst[i++]=0xd1; dst[i++]=0xf9;
+    dst[i++]=0x01; dst[i++]=0x48; dst[i++]=0x04;
+    dst[i++]=0x8b; dst[i++]=0x50; dst[i++]=0x04;
+    dst[i++]=0x81; dst[i++]=0xc2; dst[i++]=0x00; dst[i++]=0x03; dst[i++]=0x00; dst[i++]=0x00;
+    dst[i++]=0x89; dst[i++]=0x50; dst[i++]=0x0c;
+}
+#define FIXUP_SIZE 84
 
 static ResolutionChoice g_resolutionList[256];
 static int g_resolutionCount = 0;
@@ -1551,7 +1579,7 @@ static bool InstallScreenCenterHook(BYTE* moduleBase, const ScreenCenterSite& si
     if (site.length < 5 || site.length > 32)
         return false;
 
-    SIZE_T trampolineSize = site.length + sizeof(SCREEN_CENTER_FIXUP) + 5;
+    SIZE_T trampolineSize = site.length + FIXUP_SIZE + 5;
 
     BYTE* trampoline = reinterpret_cast<BYTE*>(VirtualAlloc(
         NULL,
@@ -1564,9 +1592,9 @@ static bool InstallScreenCenterHook(BYTE* moduleBase, const ScreenCenterSite& si
         return false;
 
     memcpy(trampoline, siteAddr, site.length);
-    memcpy(trampoline + site.length, SCREEN_CENTER_FIXUP, sizeof(SCREEN_CENTER_FIXUP));
+    BuildFixup(trampoline + site.length, reinterpret_cast<DWORD>(g_rectBuf));
 
-    BYTE* jmpBackAt = trampoline + site.length + sizeof(SCREEN_CENTER_FIXUP);
+    BYTE* jmpBackAt = trampoline + site.length + FIXUP_SIZE;
     BYTE* resumeVa  = moduleBase + site.rvaResume;
     DWORD jmpBackRel = static_cast<DWORD>(resumeVa - (jmpBackAt + 5));
 
@@ -1622,14 +1650,14 @@ static void PatchGameTTDll(HMODULE gameTT)
         ApplySites(base, SITES_RETAIL_2003, ARRAYSIZE(SITES_RETAIL_2003), "Retail 2003");
     else
     {
-        char msg[256];
-        wsprintfA(msg,
-            "Unsupported GameTT.dll (timestamp: 0x%08x).\n\n"
-            "Make sure you have applied the 1.2 update, then try again.\n\n"
-            "If the issue persists, open a report at:\n"
-            "https://github.com/brian8544/BlitzkriegPatch",
-            ts);
-        MessageBoxA(NULL, msg, "BlitzkriegPatch", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+        MessageBoxA(
+        NULL,
+        "Game version not supported. Try updating to version 1.2\n\n"
+        "Please open an issue at:\n"
+        "https://github.com/brian8544/BlitzkriegPatch",
+        "BlitzkriegPatch",
+        MB_OK | MB_ICONWARNING | MB_TOPMOST
+    );
     }
 }
 
